@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
+import frc.robot.subsystems.PhotonVision;
+
 
 import frc.robot.utils.Controller;
 import frc.robot.utils.Utils;
@@ -53,7 +55,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
 
   private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-  
+  private final PhotonVision vision = new PhotonVision();
 
   private static RobotContainer instance;
 
@@ -104,7 +106,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
+    new Trigger(() -> driverController.getB12())
+      .onTrue(new InstantCommand(() -> drive.resetGyro(0)));
   }
 
   private void configureAutoChooser() {

@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meter;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -20,7 +21,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants.DriveConstants;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -31,6 +34,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private final File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
   private final SwerveDrive  swerveDrive;
+  private final Pigeon2 angie;
    
      
   /**
@@ -52,26 +56,27 @@ public class SwerveSubsystem extends SubsystemBase {
     // RelativeEncoder FLencoder = frontLeft.getEncoder();
     // RelativeEncoder FRencoder = frontRight.getEncoder();
 
-  SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+    angie = new Pigeon2(24);
 
-  try
-  {
-    swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed,
-                                                                new Pose2d(new Translation2d(Meter.of(1),
-                                                                                              Meter.of(4)),
-                                                                            Rotation2d.fromDegrees(0)));
-    // Alternative method if you don't want to supply the conversion factor via JSON files.
-    // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed, angleConversionFactor, driveConversionFactor);
-  } catch (Exception e)
-  {
-    throw new RuntimeException(e);
-  }
-  swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
-  swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
-  swerveDrive.setAngularVelocityCompensation(true,
-                                              true,
-                                              0.1); //Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
-  swerveDrive.setModuleEncoderAutoSynchronize(false,
+    try
+    {
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed,
+                                                                  new Pose2d(new Translation2d(Meter.of(1),
+                                                                                                Meter.of(4)),
+                                                                              Rotation2d.fromDegrees(0)));
+      // Alternative method if you don't want to supply the conversion factor via JSON files.
+      // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed, angleConversionFactor, driveConversionFactor);
+    } catch (Exception e)
+    {
+      throw new RuntimeException(e);
+    }
+    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
+    swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
+    swerveDrive.setAngularVelocityCompensation(true,
+                                                true,
+                                                0.1); //Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
+    swerveDrive.setModuleEncoderAutoSynchronize(false,
                                               1);
   
 
@@ -79,11 +84,16 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg)
   {
+    angie = new Pigeon2(24);
     swerveDrive = new SwerveDrive(driveCfg,
                                   controllerCfg,
                                   maximumSpeed,
                                   new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
                                              Rotation2d.fromDegrees(0)));
+  }
+
+  public void resetGyro(int val) {
+    angie.setYaw(val);
   }
 
 
@@ -119,12 +129,10 @@ public class SwerveSubsystem extends SubsystemBase {
     
     return run(() -> {
       SwerveModule[] states = swerveDrive.getModules();
-      for (int i = 0; i < states.length; ++i) {
-        System.out.print(i + ": " + states[i].getRawAbsolutePosition() + " ~~~ ");
-      }
-      System.out.println();
-
-      System.out.println(angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity());
+      // for (int i = 0; i < states.length; ++i) {
+      //   System.out.print(i + ": " + states[i].getRawAbsolutePosition() + " ~~~ ");
+      // }
+     
       swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
                                           translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
                         angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),
@@ -137,6 +145,11 @@ public class SwerveSubsystem extends SubsystemBase {
   public void driveFieldOriented(ChassisSpeeds velocity)
   {
     swerveDrive.driveFieldOriented(velocity);
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("gyro", maximumSpeed);
   }
 
 }

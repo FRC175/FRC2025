@@ -54,15 +54,16 @@ public final class Constants {
         public static final double backRightBaseAngle = 0.208740;
         public static final double backLeftBaseAngle = 0.599609;
 
-        public static final double driveDeadbandX = 0.1;
-        public static final double driveDeadbandY = 0.1;
+        public static final double driveDeadbandX = 0.3;
+        public static final double driveDeadbandY = 0.3;
+        public static final double driveDeadbandTwist = 0.3;
 
 
         public static final int PIDGEON = 20;
 
         public static final double ENCODERTOANGLE = (double) 360/4096;
 
-        public static final double MAXIMUMSPEED = Units.feetToMeters(4.5);
+        public static final double MAXIMUMSPEED = Units.feetToMeters(11);
 
 
     }

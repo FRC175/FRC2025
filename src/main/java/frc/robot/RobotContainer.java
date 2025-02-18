@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,14 +28,17 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+ 
 import frc.robot.Constants.ControllerConstants;
-import frc.robot.subsystems.PhotonVision;
-
 
 import frc.robot.utils.Controller;
 import frc.robot.utils.Utils;
+import frc.robot.commands.EnableCompressor;
 
-import frc.robot.subsystems.Drive.SwerveSubsystem;
+import frc.robot.subsystems.*;
+
+
+//import frc.robot.subsystems.Drive.SwerveSubsystem;
 
 
 
@@ -50,12 +54,14 @@ public class RobotContainer {
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 ; 
   
-  private final Controller driverController/* , operatorController*/;
+  private final XboxController driverController/* , operatorController*/;
   private final XboxController operatorController;
   private final SendableChooser<Command> autoChooser;
+  private final Shuckleboard shuffleboard;
+  private final Cage cage;
 
-  private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-  private final PhotonVision vision = new PhotonVision();
+  //private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+  
 
   private static RobotContainer instance;
 
@@ -63,9 +69,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-  
 
-    driverController = new Controller(new Joystick(ControllerConstants.DRIVER_CONTROLLER_PORT));
+    this.shuffleboard = Shuckleboard.getInstance();
+    this.cage = Cage.getInstance();
+
+    driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
     autoChooser = new SendableChooser<>();
@@ -91,12 +99,15 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
+    cage.setDefaultCommand(new EnableCompressor(cage));
+    
    
-    drive.setDefaultCommand(drive.driveCommand(() ->
-     MathUtil.applyDeadband(driverController.getLeftX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> driverController.getTwist()));
+    // drive.setDefaultCommand(drive.driveCommand(() ->
+    //  MathUtil.applyDeadband(-1*driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
+    // () -> MathUtil.applyDeadband(driverController.getLeftX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
+    // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandTwist)));
      
+   
   }
 
   /**
@@ -106,8 +117,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new Trigger(() -> driverController.getB12())
-      .onTrue(new InstantCommand(() -> drive.resetGyro(0)));
+
   }
 
   private void configureAutoChooser() {

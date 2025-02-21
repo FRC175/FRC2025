@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.CyclicBarrier;
 
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -30,12 +31,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
  
 import frc.robot.Constants.ControllerConstants;
-
+import frc.robot.Constants.elevatorSetpoint;
 import frc.robot.utils.Controller;
 import frc.robot.utils.Utils;
-import frc.robot.commands.EnableCompressor;
+
 
 import frc.robot.subsystems.*;
+import frc.robot.commands.*;
 
 
 //import frc.robot.subsystems.Drive.SwerveSubsystem;
@@ -59,6 +61,7 @@ public class RobotContainer {
   private final SendableChooser<Command> autoChooser;
   private final Shuckleboard shuffleboard;
   private final Cage cage;
+  private final Elevator elevator;
 
   //private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
@@ -72,6 +75,7 @@ public class RobotContainer {
 
     this.shuffleboard = Shuckleboard.getInstance();
     this.cage = Cage.getInstance();
+    this.elevator = Elevator.getInstance();
 
     driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
@@ -99,7 +103,9 @@ public class RobotContainer {
   }
 
   private void configureDefaultCommands() {
-    cage.setDefaultCommand(new EnableCompressor(cage));
+    // cage.setDefaultCommand(new RunCommand(() -> {
+    //   cage.enableCompressor();
+    // } , cage));
     
    
     // drive.setDefaultCommand(drive.driveCommand(() ->
@@ -117,8 +123,16 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
+    new Trigger(() -> operatorController.getBButtonPressed())
+    .onTrue(new RunCommand(() -> cage.enable(), cage));
+    // B button ) triggers the cage pneumatics
+    
+    new Trigger(() -> operatorController.getAButtonPressed())
+    elevator.setGoalPoint(elevatorSetpoint.L1);
+    .onTrue(new SetElevatorPosition(.01, -.01, 10));
+    // A button ) sets the Elevator setpoint
   }
+
 
   private void configureAutoChooser() {
     

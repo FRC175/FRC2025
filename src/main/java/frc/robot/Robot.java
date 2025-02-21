@@ -8,8 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import au.grapplerobotics.CanBridge;
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.ConfigurationFailedException;
+
 import frc.robot.subsystems.*;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,7 +17,7 @@ import frc.robot.subsystems.*;
  * project.
  */
 public class Robot extends TimedRobot {
-  private LaserCan lc;
+ 
   private Cage cage;
   
   private Command m_autonomousCommand;
@@ -33,15 +32,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     
     CanBridge.runTCP();
-    lc = new LaserCan(21);
-    // Optionally initialise the settings of the LaserCAN, if you haven't already done so in GrappleHook
-    try {
-      lc.setRangingMode(LaserCan.RangingMode.LONG);
-      lc.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
-      lc.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
-    } catch (ConfigurationFailedException e) {
-      System.out.println("Configuration failed! " + e);
-    }
+    
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     
@@ -58,8 +49,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     this.cage = cage.getInstance();
-    System.out.println("huhu" + cage.getSensor());
-    LaserCan.Measurement measurement = lc.getMeasurement();
+    //System.out.println("huhu" + cage.getSensor());
+    
     // if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
     //   System.out.println("The target is " + measurement.distance_mm + "mm away!");
     // } else {
@@ -88,6 +79,12 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+  }
+
+  @Override
+  public void autonomousExit() {
+    System.out.println("Hi! this is when im called");
+    cage.enableCompressor();
   }
 
   /** This function is called periodically during autonomous. */

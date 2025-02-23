@@ -40,7 +40,7 @@ public class SetElevatorPosition extends Command{
     
     @Override
     public void end(boolean interrupted) {
-        elevator.setOpenLoop(deadband);
+        elevator.setOpenLoop(0);
         
     }
     @Override

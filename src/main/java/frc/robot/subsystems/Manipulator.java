@@ -55,6 +55,8 @@ public class Manipulator extends SubsystemBase {
         return isFlipped;
     }
 
+    
+
     private void flipIntake () {
         SparkMaxConfig flipConfig = new SparkMaxConfig
         config

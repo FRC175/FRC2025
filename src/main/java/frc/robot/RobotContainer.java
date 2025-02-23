@@ -37,7 +37,8 @@ import frc.robot.utils.Utils;
 
 
 import frc.robot.subsystems.*;
-import frc.robot.commands.*;
+import frc.robot.commands.IntakeCoral;
+import frc.robot.commands.SetElevatorPosition;
 
 
 //import frc.robot.subsystems.Drive.SwerveSubsystem;
@@ -62,6 +63,7 @@ public class RobotContainer {
   private final Shuckleboard shuffleboard;
   private final Cage cage;
   private final Elevator elevator;
+  private final Manipulator manipulator;
 
   //private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
@@ -76,6 +78,7 @@ public class RobotContainer {
     this.shuffleboard = Shuckleboard.getInstance();
     this.cage = Cage.getInstance();
     this.elevator = Elevator.getInstance();
+    this.manipulator = Manipulator.getInstance();
 
     driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
@@ -108,10 +111,11 @@ public class RobotContainer {
     // } , cage));
     
    
-    // drive.setDefaultCommand(drive.driveCommand(() ->
-    //  MathUtil.applyDeadband(-1*driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    // () -> MathUtil.applyDeadband(driverController.getLeftX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandTwist)));
+    // drive.setDefaultCommand(drive.driveFieldCommand(() ->
+    //  MathUtil.applyDeadband(-1*driverController.getLeftX(), Constants.DriveConstants.driveDeadbandY, Constants.DriveConstants.MAXIMUMSPEED),
+    // () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
+    // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
+    // () -> MathUtil.applyDeadband(driverController.getRightY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
      
    
   }
@@ -127,11 +131,40 @@ public class RobotContainer {
     .onTrue(new RunCommand(() -> cage.enable(), cage));
     // B button ) triggers the cage pneumatics
     
-    new Trigger(() -> operatorController.getAButtonPressed())
-    elevator.setGoalPoint(elevatorSetpoint.L1);
-    .onTrue(new SetElevatorPosition(.01, -.01, 10));
-    // A button ) sets the Elevator setpoint
+    new Trigger(() -> operatorController.getPOV() == 180)
+    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+      elevator.setGoalPoint(elevatorSetpoint.GROUND);}),
+      new SetElevatorPosition(.01, -.01, 10.0)
+      ));
+    // dDpad Down ) sends the elevator to Lowest position (ground))
+
+    new Trigger(() -> operatorController.getPOV() == 90)
+    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+      elevator.setGoalPoint(elevatorSetpoint.L2);}),
+      new SetElevatorPosition(.01, -.01, 10.0)
+      ));
+    // dDpad right ) sends the elevator to L2)
+
+    new Trigger(() -> operatorController.getPOV() == 270)
+    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+      elevator.setGoalPoint(elevatorSetpoint.L3);}),
+      new SetElevatorPosition(.01, -.01, 10.0)
+      ));
+    // dDpad left) sends the elevator to L3)
+
+    new Trigger(() -> operatorController.getPOV() == 0)
+    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+      elevator.setGoalPoint(elevatorSetpoint.L4);}),
+      new SetElevatorPosition(.01, -.01, 10.0)
+      ));
+    // dDpad up) sends the elevator to L4)
+
+    new Trigger(() -> operatorController.getRightBumperButton())
+    .onTrue(new IntakeCoral(.03, 0.1));
+      //tweak
   }
+
+
 
 
   private void configureAutoChooser() {

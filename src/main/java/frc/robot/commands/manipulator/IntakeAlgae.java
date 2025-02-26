@@ -1,27 +1,25 @@
-package frc.robot.commands;
+package frc.robot.commands.manipulator;
 
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Manipulator;
-import frc.robot.subsystems.Elevator;
 import frc.robot.Constants.ManipConstants;
 
-public class DischargeCoral extends Command{
+public class IntakeAlgae extends Command{
     private final Manipulator manipulator;
-    private final Elevator elevator;
-    private boolean discharging, downStream;
+    private boolean intaking;
     private double demand;
+    
    
     
    
     
 
     
-    public DischargeCoral(double demand) {
+    public IntakeAlgae(double Demand) {
       this.manipulator = Manipulator.getInstance();
-      this.elevator = Elevator.getInstance();
-      discharging = false;
-      downStream = false;
-      this.demand = -demand;
+      intaking = false;
+      this.demand = Demand;
       
 
       
@@ -30,23 +28,20 @@ public class DischargeCoral extends Command{
 
     @Override
     public void execute() {
-        elevator.coralInPeril = true;
         manipulator.setIntakeOpenLoop(demand);
-        if (downStream) {
-          discharging = true;
-        }
-      
+        intaking = true;
+
+        
     }
     
     @Override
     public void end(boolean interrupted) {
-       elevator.coralInPeril = false;
         manipulator.setIntakeOpenLoop(0);
         
     }
     @Override
     public boolean isFinished() {
-     return (!downStream && discharging);
+     return (intaking && manipulator.getIntakeSpeed() <= .1);
     }
 
 }

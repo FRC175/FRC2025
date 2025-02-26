@@ -37,8 +37,8 @@ import frc.robot.utils.Utils;
 
 
 import frc.robot.subsystems.*;
-import frc.robot.commands.IntakeCoral;
 import frc.robot.commands.SetElevatorPosition;
+import frc.robot.commands.manipulator.IntakeCoral;
 
 
 //import frc.robot.subsystems.Drive.SwerveSubsystem;
@@ -128,7 +128,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     new Trigger(() -> operatorController.getBButtonPressed())
-    .onTrue(new RunCommand(() -> cage.enable(), cage));
+    .onTrue(new RunCommand(() -> cage.enableCage(), cage));
     // B button ) triggers the cage pneumatics
     
     new Trigger(() -> operatorController.getPOV() == 180)

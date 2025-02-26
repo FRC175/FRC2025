@@ -29,8 +29,17 @@ public final class Constants {
 
     public static final class ManipConstants {
         // PLACEHOLDER VALUES. do not test until we know FOR SURE that these are correct
-        public static final double DEFAULT_POSITION = 0;
-        public static final double FLIPPED_POSITION = 270;
+        public static final double DEFAULT_POSITION = .08333;
+        public static final double FLIPPED_POSITION = .8333;
+
+        public static final double LOWER_LIMIT = .027777;
+        public static final double UPPER_LIMIT = .916666;
+    }
+
+    public static final class ElevatorConstants {
+        // PLACEHOLDER VALUES. do not test until we know FOR SURE that these are correct
+        public static final double MAX_HEIGHT = 1828.8;
+        public static final double MIN_HEIGHT = 0;
     }
 
     
@@ -67,6 +76,7 @@ public final class Constants {
         public double getSetpoint() {
             return value;
         }
+
 
     }
 

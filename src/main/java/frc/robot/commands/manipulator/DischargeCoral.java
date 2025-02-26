@@ -1,12 +1,14 @@
-package frc.robot.commands;
+package frc.robot.commands.manipulator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Manipulator;
+import frc.robot.subsystems.Elevator;
 import frc.robot.Constants.ManipConstants;
 
-public class IntakeAlgae extends Command{
+public class DischargeCoral extends Command{
     private final Manipulator manipulator;
-    private boolean intaking;
+    private final Elevator elevator;
+    private boolean discharging, downStream;
     private double demand;
    
     
@@ -14,10 +16,12 @@ public class IntakeAlgae extends Command{
     
 
     
-    public IntakeAlgae(double Demand) {
+    public DischargeCoral(double demand) {
       this.manipulator = Manipulator.getInstance();
-      intaking = false;
-      this.demand = -Demand;
+      this.elevator = Elevator.getInstance();
+      discharging = false;
+      downStream = false;
+      this.demand = -demand;
       
 
       
@@ -26,21 +30,23 @@ public class IntakeAlgae extends Command{
 
     @Override
     public void execute() {
-      boolean upstream = manipulator.isUpstream();
-      boolean downStream = manipulator.isDownstream();
-     
+        elevator.coralInPeril = true;
         manipulator.setIntakeOpenLoop(demand);
-        
+        if (downStream) {
+          discharging = true;
+        }
+      
     }
     
     @Override
     public void end(boolean interrupted) {
+       elevator.coralInPeril = false;
         manipulator.setIntakeOpenLoop(0);
         
     }
     @Override
     public boolean isFinished() {
-     return (!upStream && !downStream && intaking);
+     return (!downStream && discharging);
     }
 
 }

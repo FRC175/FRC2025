@@ -23,19 +23,23 @@ public class SetElevatorPosition extends Command{
 
     @Override
     public void execute() {
-        double dist = elevator.getDistance();
+      if (!elevator.coralInPeril || elevator.coralOverride) {
+
+      
+          dist = elevator.getDistance();
 
         if (dist - deadband <= goalPoint){
             elevator.setOpenLoop(upSpeed);
         }
         if (dist + deadband <= goalPoint) {
             elevator.setOpenLoop(-downSpeed);
+
         }
 
         
 
 
-        super.execute();
+      }
     }
     
     @Override

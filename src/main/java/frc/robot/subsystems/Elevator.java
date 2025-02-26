@@ -22,6 +22,9 @@ public class Elevator extends SubsystemBase {
     private final ResetMode resetMode;
     private final PersistMode persistMode;
     private final LaserCan distSensor;
+    public boolean coralInPeril;
+    public boolean coralOverride;
+    public boolean manual;
     private elevatorSetpoint goalPoint;
     
 
@@ -32,6 +35,7 @@ public class Elevator extends SubsystemBase {
         this.resetMode = SparkBase.ResetMode.kResetSafeParameters;
         this.persistMode = PersistMode.kPersistParameters;
         this.distSensor = new LaserCan(21);
+        coralOverride = false;
 
 
 

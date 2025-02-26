@@ -17,7 +17,7 @@ public class Cage extends SubsystemBase {
     private final DigitalInput hallSensor;
     private final PneumaticHub pcm;
     private final Compressor compressor;
-    private final DoubleSolenoid cageSolenoid;
+    private final DoubleSolenoid cageSolenoid, funnelPin;
    
     public Cage() {
         this.hallSensor = new DigitalInput(0);
@@ -25,6 +25,7 @@ public class Cage extends SubsystemBase {
         this.compressor = pcm.makeCompressor();
         compressor.disable();
         this.cageSolenoid = pcm.makeDoubleSolenoid(2,3);
+        this.funnelPin = pcm.makeDoubleSolenoid(0,1);
         cageSolenoid.set(Value.kOff);
         for (int i =0; i <4; i++) {
         pcm.setOneShotDuration(i, 1000);
@@ -51,10 +52,13 @@ public class Cage extends SubsystemBase {
         compressor.enableDigital();
     }
 
-    public void enable () {
+    public void enableCage () {
        cageSolenoid.set(Value.kForward);
        // during testing, amke sure that solenoid stays in this position
     }
+     public void collapseFunnel() {
+        funnelPin.set(Value.kForward);
+     }
 
    
     

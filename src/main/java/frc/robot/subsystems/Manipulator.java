@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.sim.SparkSimFaultManager;
 import com.revrobotics.spark.SparkBase;
@@ -100,6 +101,12 @@ public class Manipulator extends SubsystemBase {
 
     public boolean isUpstream() {
         return upstream.get();
+    }
+
+    public double getIntakeSpeed() {
+        RelativeEncoder encoder = intake.getEncoder();
+        return encoder.getVelocity();
+
     }
 
     public boolean isDownstream() {

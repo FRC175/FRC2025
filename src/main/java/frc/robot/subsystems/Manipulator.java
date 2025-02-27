@@ -31,6 +31,7 @@ public class Manipulator extends SubsystemBase {
     private final ResetMode resetMode;
     private final PersistMode persistMode;
     private boolean isFlipped;
+    public boolean manual, cc;
     private AbsoluteEncoderConfig flipConfig;
     private SparkAbsoluteEncoder flipEncoder;
     private DigitalInput upstream, downstream;
@@ -46,6 +47,8 @@ public class Manipulator extends SubsystemBase {
         this.upstream = new DigitalInput(2);
         resetMode = SparkBase.ResetMode.kResetSafeParameters;
         persistMode = PersistMode.kPersistParameters;
+        manual = false;
+        cc = false;
         
         isFlipped = false;
 

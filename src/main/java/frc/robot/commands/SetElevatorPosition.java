@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.elevatorSetpoint;
 
 public class SetElevatorPosition extends Command{
@@ -49,7 +50,9 @@ public class SetElevatorPosition extends Command{
     }
     @Override
     public boolean isFinished() {
-      if (dist - 10 <= goalPoint || dist + 10 >= goalPoint ) {
+      double max = ElevatorConstants.MAX_HEIGHT;
+      double min = ElevatorConstants.MIN_HEIGHT;
+      if (dist - 10 <= goalPoint || dist + 10 >= goalPoint || dist >= max || dist <= min || elevator.isBotProxMade() || elevator.isTopProxMade()) {
         return true;
       } else {
         return false;

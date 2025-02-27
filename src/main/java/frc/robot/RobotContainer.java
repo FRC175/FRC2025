@@ -38,7 +38,9 @@ import frc.robot.utils.Utils;
 
 import frc.robot.subsystems.*;
 import frc.robot.commands.SetElevatorPosition;
-import frc.robot.commands.manipulator.IntakeCoral;
+import frc.robot.commands.manipulator.Intake;
+import frc.robot.commands.manipulator.setManipulator;
+import frc.robot.commands.manipulator.Discharge;
 
 
 //import frc.robot.subsystems.Drive.SwerveSubsystem;
@@ -117,6 +119,7 @@ public class RobotContainer {
     // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
     // () -> MathUtil.applyDeadband(driverController.getRightY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
      
+    manipulator.setDefaultCommand(new setManipulator(10));
    
   }
 
@@ -128,7 +131,14 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     new Trigger(() -> operatorController.getBButtonPressed())
-    .onTrue(new RunCommand(() -> cage.enableCage(), cage));
+    .onTrue(new RunCommand(() -> cage.enableCage(!cage.isCageEnabled), cage))
+    .whileTrue(new RunCommand(() -> {
+      if (cage.getSensor()) {
+        operatorController.setRumble(RumbleType.kBothRumble, 1.0);
+      } else {
+        operatorController.setRumble(RumbleType.kBothRumble, 0);
+      }}));
+    
     // B button ) triggers the cage pneumatics
     
     new Trigger(() -> operatorController.getPOV() == 180)
@@ -160,8 +170,38 @@ public class RobotContainer {
     // dDpad up) sends the elevator to L4)
 
     new Trigger(() -> operatorController.getRightBumperButton())
-    .onTrue(new IntakeCoral(.03, 0.1));
+    .onTrue(
+      new Intake(.03, 0.01)
+    )
+    .onFalse(new InstantCommand(() -> {
+      manipulator.setIntakeOpenLoop(0); }, manipulator));
       //tweak
+
+      new Trigger(() -> operatorController.getLeftBumperButton())
+      .onTrue(new Discharge(.03))
+      .onFalse(new InstantCommand(() -> {
+        manipulator.setIntakeOpenLoop(0); }, manipulator));
+
+    new Trigger(() -> operatorController.getAButtonPressed())
+    .onTrue(new setManipulator(10));
+
+    new Trigger(() -> operatorController.getXButtonPressed())
+    .onTrue(new RunCommand(() -> cage.collapseFunnel(), cage));
+
+    new Trigger(() -> operatorController.getLeftTriggerAxis() > 0.2)
+    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+      manipulator.manual = true;}), new InstantCommand(() -> {
+        manipulator.cc = false;})
+      ));
+
+      new Trigger(() -> operatorController.getRightTriggerAxis() > 0.2)
+    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+      manipulator.manual = true;}), new InstantCommand(() -> {
+        manipulator.cc = true;})
+      ));
+   
+
+    
   }
 
 

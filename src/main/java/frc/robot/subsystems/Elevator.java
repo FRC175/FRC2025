@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -26,6 +27,7 @@ public class Elevator extends SubsystemBase {
     public boolean coralOverride;
     public boolean manual;
     private elevatorSetpoint goalPoint;
+    private final DigitalInput topProxSwitch, botProxSwitch;
     
 
     public Elevator() {
@@ -36,6 +38,8 @@ public class Elevator extends SubsystemBase {
         this.persistMode = PersistMode.kPersistParameters;
         this.distSensor = new LaserCan(21);
         coralOverride = false;
+        this.botProxSwitch = new DigitalInput(3);
+        this.topProxSwitch = new DigitalInput(4);
 
 
 
@@ -50,6 +54,14 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
        
+    }
+
+    public boolean isTopProxMade () {
+        return topProxSwitch.get();
+    }
+
+    public boolean isBotProxMade () {
+        return botProxSwitch.get();
     }
     
 

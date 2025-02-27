@@ -5,7 +5,7 @@ import frc.robot.subsystems.Manipulator;
 import frc.robot.subsystems.Elevator;
 import frc.robot.Constants.ManipConstants;
 
-public class IntakeCoral extends Command{
+public class Intake extends Command{
     private final Manipulator manipulator;
     private final Elevator elevator;
     private boolean intaking, upStream, downStream;
@@ -17,7 +17,7 @@ public class IntakeCoral extends Command{
     
 
     
-    public IntakeCoral(double highDemand, double lowDemand) {
+    public Intake(double highDemand, double lowDemand) {
       this.manipulator = Manipulator.getInstance();
       this.elevator = Elevator.getInstance();
       intaking = false;
@@ -33,18 +33,24 @@ public class IntakeCoral extends Command{
 
     @Override
     public void execute() {
-      boolean upstream = manipulator.isUpstream();
-      boolean downStream = manipulator.isDownstream();
-      elevator.coralInPeril = true;
-     
-        manipulator.setIntakeOpenLoop(highDemand);
-        if (upstream) {
+      if (!manipulator.isFlipped()) {
+        boolean upstream = manipulator.isUpstream();
+        boolean downStream = manipulator.isDownstream();
+        elevator.coralInPeril = true;
+      
+          manipulator.setIntakeOpenLoop(highDemand);
+          if (upstream) {
+            intaking = true;
+            manipulator.setIntakeOpenLoop(lowDemand);
+          }
+          if (downStream) {
+            intaking = true;
+            manipulator.setIntakeOpenLoop(-lowDemand); 
+          }
+        } else {
+          manipulator.setIntakeOpenLoop(-highDemand);
           intaking = true;
-          manipulator.setIntakeOpenLoop(lowDemand);
-        }
-        if (downStream) {
-          intaking = true;
-          manipulator.setIntakeOpenLoop(-lowDemand); 
+
         }
     }
     
@@ -56,7 +62,13 @@ public class IntakeCoral extends Command{
     }
     @Override
     public boolean isFinished() {
-     return (!upStream && !downStream && intaking);
+
+    if (!manipulator.isFlipped()) {
+      return (!upStream && !downStream && intaking);
+    } else {
+      return (intaking && manipulator.getIntakeSpeed() <= .1);
+    }
+      
     }
 
 }

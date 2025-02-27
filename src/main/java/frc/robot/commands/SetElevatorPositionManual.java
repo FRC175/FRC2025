@@ -35,7 +35,7 @@ public class SetElevatorPositionManual extends Command{
     public boolean isFinished() {
       double maxheight = ElevatorConstants.MAX_HEIGHT;
       double minHeight = ElevatorConstants.MIN_HEIGHT;
-      return (dist >= maxheight|| dist <= minHeight);
+      return (dist >= maxheight|| dist <= minHeight || elevator.isBotProxMade() || elevator.isTopProxMade());
     }
 
 }

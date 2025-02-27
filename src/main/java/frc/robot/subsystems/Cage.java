@@ -18,9 +18,11 @@ public class Cage extends SubsystemBase {
     private final PneumaticHub pcm;
     private final Compressor compressor;
     private final DoubleSolenoid cageSolenoid, funnelPin;
+    public boolean isCageEnabled;
    
     public Cage() {
         this.hallSensor = new DigitalInput(0);
+        isCageEnabled = false;
         this.pcm = new PneumaticHub(22);
         this.compressor = pcm.makeCompressor();
         compressor.disable();
@@ -52,8 +54,12 @@ public class Cage extends SubsystemBase {
         compressor.enableDigital();
     }
 
-    public void enableCage () {
-       cageSolenoid.set(Value.kForward);
+    public void enableCage (boolean climbEnabled) {
+       if (climbEnabled) {
+        cageSolenoid.set(Value.kForward);
+       } else {
+        cageSolenoid.set(Value.kReverse);
+       }
        // during testing, amke sure that solenoid stays in this position
     }
      public void collapseFunnel() {

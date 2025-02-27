@@ -42,8 +42,8 @@ public class Manipulator extends SubsystemBase {
         this.defaultConfig = new SparkMaxConfig();
         this.flipEncoder = flip.getAbsoluteEncoder();
         this.flipConfig = new AbsoluteEncoderConfig();
-        this.downstream = new DigitalInput(0);
-        this.upstream = new DigitalInput(0);
+        this.downstream = new DigitalInput(1);
+        this.upstream = new DigitalInput(2);
         resetMode = SparkBase.ResetMode.kResetSafeParameters;
         persistMode = PersistMode.kPersistParameters;
         

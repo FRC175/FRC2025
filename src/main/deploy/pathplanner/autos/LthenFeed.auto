@@ -13,7 +13,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Outtake"
+            "name": "swerveToTag"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "discharge"
           }
         },
         {
@@ -26,6 +32,12 @@
           "type": "named",
           "data": {
             "name": "Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BL) L"
           }
         }
       ]

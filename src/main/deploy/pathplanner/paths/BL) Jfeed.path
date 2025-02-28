@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.094774590163934,
-        "y": 5.565420081967212
+        "x": 5.4903688524590155,
+        "y": 5.7212602459016395
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.1542579376249735,
-        "y": 6.292587215716453
+        "x": 4.549852199920055,
+        "y": 6.44842737965088
       },
       "isLocked": false,
       "linkedName": "J"
@@ -25,13 +25,20 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "BlueFeed"
+      "linkedName": "JScore"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "SetElevatorGround",
+      "waypointRelativePos": 0.2592842673868955,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

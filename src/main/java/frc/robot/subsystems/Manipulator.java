@@ -21,6 +21,9 @@ import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.AlternateEncoderConfig;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.ManipConstants;
+import frc.robot.Constants.elevatorSetpoint;
+import frc.robot.Constants.manipulatorSetpoint;
 
 
 
@@ -38,6 +41,7 @@ public class Manipulator extends SubsystemBase {
     private AbsoluteEncoderConfig flipConfig;
     private SparkAbsoluteEncoder flipEncoder;
     private DigitalInput upstream, downstream;
+    private manipulatorSetpoint currentSetpoint, goalPosition;
     // default position (false) is coral
 
     public Manipulator() {
@@ -62,7 +66,8 @@ public class Manipulator extends SubsystemBase {
         .inverted(false)
         .setSparkMaxDataPortConfig();
         
-
+        goalPosition = manipulatorSetpoint.CORAL;
+        currentSetpoint = manipulatorSetpoint.CORAL;
     }
     
     @Override
@@ -119,6 +124,22 @@ public class Manipulator extends SubsystemBase {
 
     public boolean isDownstream() {
         return downstream.get();
+    }
+
+    public manipulatorSetpoint getGoalSetpoint() {
+        return goalPosition;
+    }
+
+    public void setGoalSetpoint(manipulatorSetpoint setpoint) {
+        goalPosition = setpoint;
+    }
+
+    public manipulatorSetpoint getCurrentSetpoint() {
+        return currentSetpoint;
+    }
+
+    public void setCurrentSetpoint(manipulatorSetpoint  setpoint) {
+        currentSetpoint = setpoint;
     }
 
 

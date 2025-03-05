@@ -81,6 +81,24 @@ public final class Constants {
 
     }
 
+    public enum manipulatorSetpoint {
+        CORAL(0.317919),
+        ALGAE( .8333),
+        INTAKING(0.319952);
+        
+
+        double value;
+        manipulatorSetpoint(double value) {
+                this.value = value;
+        }
+
+        public double getSetpoint() {
+            return value;
+        }
+
+
+    }
+
     public static final class LEDConstants {
         public static final int BLINKIN_PORT = 12;
     }

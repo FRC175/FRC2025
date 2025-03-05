@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.elevatorSetpoint;
+import frc.robot.Constants.manipulatorSetpoint;
 import frc.robot.utils.Controller;
 import frc.robot.utils.Utils;
 
@@ -43,7 +44,8 @@ import frc.robot.utils.Utils;
 import frc.robot.subsystems.*;
 import frc.robot.commands.SetElevatorPosition;
 import frc.robot.commands.manipulator.Intake;
-import frc.robot.commands.manipulator.setManipulator;
+import frc.robot.commands.manipulator.setManipWorking;
+
 import frc.robot.commands.manipulator.Discharge;
 import frc.robot.commands.SetElevatorPositionManual;
 //import frc.robot.commands.SwerveToTag;
@@ -137,7 +139,9 @@ public class RobotContainer {
     // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
     // () -> MathUtil.applyDeadband(driverController.getRightY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
      
-   // manipulator.setDefaultCommand(new setManipulator(manipulator, 10, false));
+   manipulator.setDefaultCommand (new setManipWorking(manipulator, .1, 0.3));
+
+   elevator.setDefaultCommand(new InstantCommand(() -> {}, elevator));
    
   }
 
@@ -149,13 +153,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     new Trigger(() -> operatorController.getBButtonPressed())
-    .onTrue(new RunCommand(() -> cage.enableCage(!cage.isCageEnabled), cage))
-    .whileTrue(new RunCommand(() -> {
-      if (cage.getSensor()) {
-        operatorController.setRumble(RumbleType.kBothRumble, 1.0);
-      } else {
-        operatorController.setRumble(RumbleType.kBothRumble, 0);
-      }}));
+    .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.ALGAE);;}));
+  
+     new Trigger(() -> operatorController.getAButtonPressed())
+    .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.CORAL);;}));
+   
+     new Trigger(() -> operatorController.getXButtonPressed())
+    .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.INTAKING);;}));
+   
+    
     
     // B button ) triggers the cage pneumatics
     

@@ -14,6 +14,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
 import frc.robot.Constants.elevatorSetpoint;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class Elevator extends SubsystemBase {
@@ -53,7 +54,7 @@ public class Elevator extends SubsystemBase {
     
     @Override
     public void periodic() {
-       
+       SmartDashboard.putNumber("ele dist", getDistance());
     }
 
     public boolean isTopProxMade () {
@@ -92,7 +93,7 @@ public class Elevator extends SubsystemBase {
     
     public double getDistance() {
         LaserCan.Measurement measurement = distSensor.getMeasurement();
-        return (measurement.distance_mm + -240) ;
+        return (measurement.distance_mm + -123.6) ;
     }
 
     public void setOpenLoop (double demand) {

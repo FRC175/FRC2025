@@ -8,42 +8,73 @@ import frc.robot.Constants.ManipConstants;
 
 public class setManipulator extends Command{
     private final Manipulator manipulator;
-    private final double goalAngle, currentAngle, deadband, lowerLimit, upperLimit;
-    private boolean surpassedLimit;
+    private double goalAngle, currentAngle;
+    private final double deadband, lowerLimit, upperLimit;
+    private boolean surpassedLimit, manual,manualTweak, cc;
+  
     
     
 
     
-    public setManipulator(double deadband) {
-      this.manipulator = Manipulator.getInstance();
+    public setManipulator(Manipulator manipulator, double deadband, boolean flip) {
+      this.manipulator = manipulator;
       this.deadband = deadband;
       lowerLimit = ManipConstants.LOWER_LIMIT;
       upperLimit = ManipConstants.UPPER_LIMIT;
       surpassedLimit = false;
-      
-      
-      if (manipulator.isFlipped()) {
-        goalAngle = ManipConstants.DEFAULT_POSITION;
-      } else {
-        goalAngle = ManipConstants.FLIPPED_POSITION;
-      }
+      this.manualTweak = false;
+      this.cc = manipulator.cc;
 
-      currentAngle = goalAngle;
+      addRequirements(manipulator);
+      
+      
+     if (!manualTweak) { 
+      currentAngle= manipulator.getEncoder();
+       if (flip) {
+        if (manipulator.isFlipped()) {
+          goalAngle = ManipConstants.DEFAULT_POSITION;
+        } else {
+          goalAngle = ManipConstants.FLIPPED_POSITION;
+        }
+
+       } else {
+        goalAngle = currentAngle;
+       }
+      } else {
+        currentAngle= manipulator.getEncoder();
+       if (!cc) {
+        goalAngle = (currentAngle += .005);
+       } else {
+        goalAngle = (currentAngle -= .005);
+       }
+      }
       
     }
 
     @Override
     public void execute() {
-      
+      System.out.println("HI!!!! I CAN SEE YOUR INPUTS  YOUR CODE SUCKS!!");
       double currentAngle = manipulator.getEncoder();
-      if (currentAngle >= upperLimit || currentAngle <= lowerLimit) {
+      System.out.println(surpassedLimit);
+      if (currentAngle <= upperLimit || currentAngle >= lowerLimit) {
         manipulator.setFlipOpenLoop(0);
         surpassedLimit = true;
       }
-      manipulator.invertFlip();
-      if (currentAngle - deadband < goalAngle || currentAngle + deadband > goalAngle) {
-        manipulator.setFlipOpenLoop(0.2);
+      if  (!(surpassedLimit || (currentAngle - deadband < goalAngle || currentAngle + deadband > goalAngle))){
+
+      if (!manual) {
+        manipulator.invertFlip();
       }
+      if (currentAngle - deadband < goalAngle || currentAngle + deadband > goalAngle) {
+        manipulator.setFlipOpenLoop(-0.3);
+      } 
+    } else {
+      manipulator.setFlipOpenLoop(0);
+      manualTweak = false;
+      if (!surpassedLimit) {
+        manipulator.setFlipped(!manipulator.isFlipped());
+       }
+    }
 
       
 
@@ -56,18 +87,22 @@ public class setManipulator extends Command{
     
     @Override
     public void end(boolean interrupted) {
-      manipulator.setFlipOpenLoop(0);
+     if (!manual) {
+        manipulator.setFlipOpenLoop(0);
+     }
      if (!surpassedLimit) {
       manipulator.setFlipped(!manipulator.isFlipped());
      }
+     manualTweak = false;
+     }
+   
       
       
         
-    }
     @Override
     public boolean isFinished() {
      
-     return (surpassedLimit || (currentAngle - deadband < goalAngle || currentAngle + deadband > goalAngle));
+     return false;
     }
 
 }

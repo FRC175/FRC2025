@@ -29,17 +29,18 @@ public final class Constants {
 
     public static final class ManipConstants {
         // PLACEHOLDER VALUES. do not test until we know FOR SURE that these are correct
-        public static final double DEFAULT_POSITION = .08333;
+        public static final double DEFAULT_POSITION = 0.317919;
+        public static final double INTAKE_POSITION = 0.319952;
         public static final double FLIPPED_POSITION = .8333;
 
-        public static final double LOWER_LIMIT = .027777;
-        public static final double UPPER_LIMIT = .916666;
+        public static final double LOWER_LIMIT = 0.290622;
+        public static final double UPPER_LIMIT = 0.838988;
     }
 
     public static final class ElevatorConstants {
         // PLACEHOLDER VALUES. do not test until we know FOR SURE that these are correct
-        public static final double MAX_HEIGHT = 1828.8;
-        public static final double MIN_HEIGHT = 0;
+        public static final double MAX_HEIGHT = 1100;
+        public static final double MIN_HEIGHT = 24.5;
     }
 
     
@@ -61,11 +62,11 @@ public final class Constants {
     }
 
     public enum elevatorSetpoint {
-        GROUND(0),
-        L1(330),
-        L2(810),
-        L3(1210),
-        L4(1828.8);
+        GROUND(25.4),
+        L1(321),
+        L2(321),
+        L3(478),
+        L4(722);
         
 
         double value;

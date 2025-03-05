@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.CyclicBarrier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -41,6 +45,8 @@ import frc.robot.commands.SetElevatorPosition;
 import frc.robot.commands.manipulator.Intake;
 import frc.robot.commands.manipulator.setManipulator;
 import frc.robot.commands.manipulator.Discharge;
+import frc.robot.commands.SetElevatorPositionManual;
+//import frc.robot.commands.SwerveToTag;
 
 
 //import frc.robot.subsystems.Drive.SwerveSubsystem;
@@ -67,7 +73,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Manipulator manipulator;
 
-  //private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+ // private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
 
   private static RobotContainer instance;
@@ -86,7 +92,8 @@ public class RobotContainer {
     operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
 
     autoChooser = new SendableChooser<>();
-    
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
      
 
     // Configure the default commands
@@ -107,6 +114,17 @@ public class RobotContainer {
     return instance;
   }
 
+  // public void registerCommandsAuto() {
+  //     //NamedCommands.registerCommand("SwerveToTag", new SwerveToTag(drive));
+  //     NamedCommands.registerCommand("Intake", new Intake(.03, .01));
+  //     NamedCommands.registerCommand("Discharge", new Discharge(.03));
+      
+
+  // }
+
+   
+
+
   private void configureDefaultCommands() {
     // cage.setDefaultCommand(new RunCommand(() -> {
     //   cage.enableCompressor();
@@ -119,7 +137,7 @@ public class RobotContainer {
     // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
     // () -> MathUtil.applyDeadband(driverController.getRightY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
      
-    manipulator.setDefaultCommand(new setManipulator(10));
+   // manipulator.setDefaultCommand(new setManipulator(manipulator, 10, false));
    
   }
 
@@ -144,28 +162,28 @@ public class RobotContainer {
     new Trigger(() -> operatorController.getPOV() == 180)
     .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
       elevator.setGoalPoint(elevatorSetpoint.GROUND);}),
-      new SetElevatorPosition(.01, -.01, 10.0)
+      new SetElevatorPosition(.01, .01, 6.0)
       ));
     // dDpad Down ) sends the elevator to Lowest position (ground))
 
     new Trigger(() -> operatorController.getPOV() == 90)
     .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
       elevator.setGoalPoint(elevatorSetpoint.L2);}),
-      new SetElevatorPosition(.01, -.01, 10.0)
+      new SetElevatorPosition(.01, .01, 6.0)
       ));
     // dDpad right ) sends the elevator to L2)
 
     new Trigger(() -> operatorController.getPOV() == 270)
     .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
       elevator.setGoalPoint(elevatorSetpoint.L3);}),
-      new SetElevatorPosition(.01, -.01, 10.0)
+      new SetElevatorPosition(.01, .01, 6.0)
       ));
     // dDpad left) sends the elevator to L3)
 
     new Trigger(() -> operatorController.getPOV() == 0)
     .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
       elevator.setGoalPoint(elevatorSetpoint.L4);}),
-      new SetElevatorPosition(.01, -.01, 10.0)
+      new SetElevatorPosition(.01, .01, 6.0)
       ));
     // dDpad up) sends the elevator to L4)
 
@@ -182,24 +200,32 @@ public class RobotContainer {
       .onFalse(new InstantCommand(() -> {
         manipulator.setIntakeOpenLoop(0); }, manipulator));
 
-    new Trigger(() -> operatorController.getAButtonPressed())
-    .onTrue(new setManipulator(10));
+    // new Trigger(() -> operatorController.getAButtonPressed())
+    // .onTrue(new setManipulator(.25, true));
 
     new Trigger(() -> operatorController.getXButtonPressed())
     .onTrue(new RunCommand(() -> cage.collapseFunnel(), cage));
 
     new Trigger(() -> operatorController.getLeftTriggerAxis() > 0.2)
-    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+    .whileTrue(new ParallelCommandGroup(new InstantCommand(() -> {
       manipulator.manual = true;}), new InstantCommand(() -> {
         manipulator.cc = false;})
       ));
 
       new Trigger(() -> operatorController.getRightTriggerAxis() > 0.2)
-    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+    .whileTrue(new ParallelCommandGroup(new InstantCommand(() -> {
       manipulator.manual = true;}), new InstantCommand(() -> {
         manipulator.cc = true;})
       ));
    
+      //change to new buttons
+      new Trigger(() -> operatorController.getRightStickButton())
+    .whileTrue(new SetElevatorPositionManual(true, 0.1)
+    
+      );
+
+      new Trigger(() -> operatorController.getRightTriggerAxis() > 0.2)
+    .whileTrue(new SetElevatorPositionManual(true, -0.1));
 
     
   }

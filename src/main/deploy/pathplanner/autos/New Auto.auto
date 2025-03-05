@@ -13,12 +13,6 @@
         {
           "type": "named",
           "data": {
-            "name": "swerveToTag"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "discharge"
           }
         },
@@ -31,6 +25,12 @@
         {
           "type": "named",
           "data": {
+            "name": "swerveToTag"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Intake"
           }
         },
@@ -38,6 +38,18 @@
           "type": "path",
           "data": {
             "pathName": "BL) L"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "swerveToTag"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "discharge"
           }
         }
       ]

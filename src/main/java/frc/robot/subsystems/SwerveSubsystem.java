@@ -3,10 +3,12 @@
 // import static edu.wpi.first.units.Units.Meter;
 
 // import java.io.File;
+// import java.lang.reflect.Field;
 // import java.util.function.DoubleSupplier;
 
 // import edu.wpi.first.wpilibj.DriverStation;
 // import edu.wpi.first.wpilibj.Filesystem;
+// import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj2.command.Command;
 // import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,6 +25,7 @@
 // import edu.wpi.first.math.geometry.Rotation2d;
 // import edu.wpi.first.math.geometry.Translation2d;
 // import edu.wpi.first.math.kinematics.ChassisSpeeds;
+// import edu.wpi.first.math.util.Units;
 // import edu.wpi.first.units.measure.Angle;
 // import frc.robot.Constants.DriveConstants;
 // import com.ctre.phoenix6.hardware.Pigeon2;
@@ -31,6 +34,9 @@
 // import com.pathplanner.lib.config.PIDConstants;
 // import com.pathplanner.lib.config.RobotConfig;
 // import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+// import com.pathplanner.lib.path.PathConstraints;
+
+// import frc.robot.subsystems.PhotonVision;
 
 
 // public class SwerveSubsystem extends SubsystemBase {
@@ -42,6 +48,7 @@
 //   private final File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve");
 //   private final SwerveDrive  swerveDrive;
 //   private final Pigeon2 angie;
+//   private PhotonVision photonVision;
    
      
 //   /**
@@ -149,6 +156,22 @@
     
 //   }
 
+//   public Command driveToPose(Pose2d pose)
+//   {
+// // Create the constraints to use while pathfinding
+//     PathConstraints constraints = new PathConstraints(
+//         swerveDrive.getMaximumChassisVelocity(), 4.0,
+//         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
+
+// // Since AutoBuilder is configured, we can use it to build pathfinding commands
+//     return AutoBuilder.pathfindToPose(
+//         pose,
+//         constraints,
+//         edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
+//                                      );
+//   }
+
+
 //   public void driveFieldOriented(ChassisSpeeds velocity)
 //   {
 //     swerveDrive.driveFieldOriented(velocity);
@@ -159,11 +182,38 @@
 //     SmartDashboard.putNumber("gyro", maximumSpeed);
 //   }
 
-//     public void setupPathPlanner()
+//   public void setupPhotonVision () {
+//     photonVision = new PhotonVision(swerveDrive::getPose, swerveDrive.field);
+//   }
+
+//   public PhotonVision setupPhotonVisionObject () {
+//     return (new PhotonVision(swerveDrive::getPose, swerveDrive.field));
+//   }
+  
+//   public Field2d getField() {
+//     return swerveDrive.field;
+//   }
+//   public Pose2d getPose()
+//   {
+//     return swerveDrive.getPose();
+//   }
+
+//   public void resetOdometry(Pose2d initialHolonomicPose)
+//   {
+//     swerveDrive.resetOdometry(initialHolonomicPose);
+//   }
+//   public ChassisSpeeds getRobotVelocity()
+//   {
+//     return swerveDrive.getRobotVelocity();
+//   }
+  
+//   public void setupPathPlanner()
 //   {
 //     // Load the RobotConfig from the GUI settings. You should probably
 //     // store this in your Constants file
 //     RobotConfig config;
+    
+    
 //     try
 //     {
 //       config = RobotConfig.fromGUISettings();

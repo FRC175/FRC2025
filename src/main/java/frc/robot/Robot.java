@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import au.grapplerobotics.CanBridge;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.subsystems.*;
 /**
@@ -48,8 +49,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    this.cage = cage.getInstance();
-    //System.out.println("huhu" + cage.getSensor());
+    SmartDashboard.updateValues();
+
+    // this.cage = cage.getInstance();
+    // System.out.println("huhu" + cage.getSensor());
     
     // if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
     //   System.out.println("The target is " + measurement.distance_mm + "mm away!");

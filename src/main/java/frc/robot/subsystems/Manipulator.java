@@ -20,11 +20,14 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.AlternateEncoderConfig;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 
 
 public class Manipulator extends SubsystemBase {
+    
+    
     private static Manipulator instance;
     private final SparkMax flip, intake;
     private final SparkMaxConfig defaultConfig;
@@ -64,8 +67,10 @@ public class Manipulator extends SubsystemBase {
     
     @Override
     public void periodic() {
-        System.out.println("upstream: " + upstream.get());
-        System.out.println("downstream: " + upstream.get());
+        SmartDashboard.putNumber("manip Encoder", getEncoder());
+        //SmartDashboard.putNumber("motor demand",)
+    //     System.out.println("upstream: " + upstream.get());
+    //     System.out.println("downstream: " + upstream.get());
     }
 
     public static Manipulator getInstance() {

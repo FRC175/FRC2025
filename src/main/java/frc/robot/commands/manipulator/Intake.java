@@ -39,17 +39,17 @@ public class Intake extends Command{
         elevator.coralInPeril = true;
       
           manipulator.setIntakeOpenLoop(highDemand);
-          if (upstream) {
-            intaking = true;
+          intaking = true;
+          if (!upstream) {
             manipulator.setIntakeOpenLoop(lowDemand);
           }
           if (downStream) {
-            intaking = true;
             manipulator.setIntakeOpenLoop(-lowDemand); 
+            intaking = false;
           }
-        } else {
+       } else {
           manipulator.setIntakeOpenLoop(-highDemand);
-          intaking = true;
+          
 
         }
     }

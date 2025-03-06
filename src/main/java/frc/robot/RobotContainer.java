@@ -134,11 +134,10 @@ private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.ge
     // cage.setDefaultCommand(new RunCommand(() -> {
     //   cage.enableCompressor();
     // } , cage));
-    drive.setDefaultCommand(drive.driveCommand(() ->
+    drive.setDefaultCommand(drive.driveRelativeCommand(() ->
      MathUtil.applyDeadband(-1*driverController.getLeftX(), Constants.DriveConstants.driveDeadbandY, Constants.DriveConstants.MAXIMUMSPEED),
     () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> MathUtil.applyDeadband(driverController.getRightY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
+    () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
    
    
     //manipulator.setDefaultCommand (new setManipWorking(manipulator, .05, 0.3));

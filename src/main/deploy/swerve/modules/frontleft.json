@@ -11,12 +11,12 @@
   },
   "angle": {
     "type": "sparkmax_neo",
-    "id": 8,
+    "id": 6,
     "canbus": "rio"
   },
   "encoder": {
     "type": "attached",
-    "id": 23,
+    "id": 13,
     "canbus": "CANivore_BUS"
   },
   "inverted": {

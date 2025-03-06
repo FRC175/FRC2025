@@ -6,17 +6,17 @@
   "absoluteEncoderOffset": 360,
   "drive": {
     "type": "sparkmax_neo",
-    "id": 11,
+    "id": 9,
     "canbus": "rio"
   },
   "angle": {
     "type": "sparkmax_neo",
-    "id": 20,
+    "id": 8,
     "canbus": "rio"
   },
   "encoder": {
     "type": "attached",
-    "id": 24,
+    "id": 14,
     "canbus": "CANivore_BUS"
   },
   "inverted": {

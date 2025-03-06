@@ -7,7 +7,6 @@
   "drive": {
     "type": "sparkmax_neo",
     "id": 3,
-    "id": 3,
     "canbus": "rio"
   },
   "angle": {
@@ -16,7 +15,7 @@
     "canbus": "rio"
   },
   "encoder": {
-    "type": "attached",
+    "type": "cancoder",
     "id": 11,
     "canbus": "CANivore_BUS"
   },

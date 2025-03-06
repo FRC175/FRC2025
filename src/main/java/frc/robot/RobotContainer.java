@@ -49,10 +49,7 @@ import frc.robot.commands.manipulator.setManipWorking;
 
 import frc.robot.commands.manipulator.Discharge;
 import frc.robot.commands.SetElevatorPositionManual;
-//import frc.robot.commands.SwerveToTag;
-
-
-import frc.robot.subsystems.SwerveSubsystem;
+// import frc.robot.commands.Swerve;
 
 
 
@@ -69,14 +66,15 @@ public class RobotContainer {
 ; 
   
   private final XboxController driverController/* , operatorController*/;
-  private final GenericHID operatorController;
+  private final XboxController operatorController;
   private final SendableChooser<Command> autoChooser;
-  private final Shuckleboard shuffleboard;
+ /// private final Shuckleboard shuffleboard;
   private final Cage cage;
   private final Elevator elevator;
   private final Manipulator manipulator;
 
- private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+
+private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
 
   private static RobotContainer instance;
@@ -86,14 +84,15 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    this.shuffleboard = Shuckleboard.getInstance();
+    //this.shuffleboard = Shuckleboard.getInstance();
     this.cage = Cage.getInstance();
     this.elevator = Elevator.getInstance();
     this.manipulator = Manipulator.getInstance();
+    
 
     driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
-    //operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
-    operatorController = new GenericHID(1);
+    operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    
     autoChooser = new SendableChooser<>();
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -129,17 +128,20 @@ public class RobotContainer {
 
 
   private void configureDefaultCommands() {
+
+    // drive.setDefaultCommand(new Swerve(driverController, drive));
+
     // cage.setDefaultCommand(new RunCommand(() -> {
     //   cage.enableCompressor();
     // } , cage));
-    
-   
-    drive.setDefaultCommand(drive.driveRelativeCommand(() ->
+    drive.setDefaultCommand(drive.driveCommand(() ->
      MathUtil.applyDeadband(-1*driverController.getLeftX(), Constants.DriveConstants.driveDeadbandY, Constants.DriveConstants.MAXIMUMSPEED),
     () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
-    
-   //manipulator.setDefaultCommand (new setManipWorking(manipulator, .05, 0.3));
+    () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
+    () -> MathUtil.applyDeadband(driverController.getRightY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
+   
+   
+    //manipulator.setDefaultCommand (new setManipWorking(manipulator, .05, 0.3));
 
    elevator.setDefaultCommand(new InstantCommand(() -> {}, elevator));
    
@@ -152,34 +154,34 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new Trigger(() -> driverController.getBButtonPressed())
+    new Trigger(() -> operatorController.getBButtonPressed())
     .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.ALGAE);;}));
   
-     new Trigger(() -> driverController.getAButtonPressed())
+     new Trigger(() -> operatorController.getAButtonPressed())
     .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.CORAL);;}));
    
-     new Trigger(() -> driverController.getXButtonPressed())
+     new Trigger(() -> operatorController.getXButtonPressed())
     .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.INTAKING);;}));
    
     
     
     // B button ) triggers the cage pneumatics
     
-    new Trigger(() -> operatorController.getRawButtonPressed(3))
-    .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.GROUND));
-    // dDpad Down ) sends the elevator to Lowest position (ground))
-    new Trigger(() -> operatorController.getRawButtonPressed(14))
-    .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L1));
-    new Trigger(() -> operatorController.getRawButtonPressed(10))
-    .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L2));
-    new Trigger(() -> operatorController.getRawButtonPressed(6))
-    .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L3));
-    new Trigger(() -> operatorController.getRawButtonPressed(2))
-    .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L4));
+    // new Trigger(() -> operatorController.getBButtonPressed())
+    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.GROUND));
+    // // dDpad Down ) sends the elevator to Lowest position (ground))
+    // new Trigger(() -> operatorController.getRawButtonPressed(14))
+    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L1));
+    // new Trigger(() -> operatorController.getRawButtonPressed(10))
+    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L2));
+    // new Trigger(() -> operatorController.getRawButtonPressed(6))
+    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L3));
+    // new Trigger(() -> operatorController.getRawButtonPressed(2))
+    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L4));
    
     // dDpad up) sends the elevator to L4)
 
-    new Trigger(() -> operatorController.getRawButtonPressed(16))
+    new Trigger(() -> operatorController.getLeftBumperButton())
     .onTrue(
       new Intake(.1, 0.03)
     )
@@ -187,7 +189,7 @@ public class RobotContainer {
       manipulator.setIntakeOpenLoop(0); }, manipulator));
       //tweak
 
-      new Trigger(() -> operatorController.getRawButtonPressed(15))
+      new Trigger(() -> operatorController.getRightBumperButton())
       .onTrue(new Discharge(.03))
       .onFalse(new InstantCommand(() -> {
         manipulator.setIntakeOpenLoop(0); }, manipulator));
@@ -197,32 +199,33 @@ public class RobotContainer {
 
         // button 13 is a spare
 
-    new Trigger(() -> operatorController.getRawButtonPressed(5))
-    .onTrue(new RunCommand(() -> cage.collapseFunnel(), cage));
+  //   new Trigger(() -> operatorController.getRawButtonPressed(5))
+  //   .onTrue(new RunCommand(() -> cage.collapseFunnel(), cage));
 
-    new Trigger(() -> operatorController.getRawButtonPressed(4))
-    .whileTrue(new ParallelCommandGroup(new InstantCommand(() -> {
-      manipulator.manual = true;}), new InstantCommand(() -> {
-        manipulator.cc = false;})
-      ));
+  //   new Trigger(() -> operatorController.getRawButtonPressed(4))
+  //   .whileTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+  //     manipulator.manual = true;}), new InstantCommand(() -> {
+  //       manipulator.cc = false;})
+  //     ));
 
-      new Trigger(() -> operatorController.getRawButtonPressed(8))
-    .whileTrue(new ParallelCommandGroup(new InstantCommand(() -> {
-      manipulator.manual = true;}), new InstantCommand(() -> {
-        manipulator.cc = true;})
-      ));
+  //     new Trigger(() -> operatorController.getRawButtonPressed(8))
+  //   .whileTrue(new ParallelCommandGroup(new InstantCommand(() -> {
+  //     manipulator.manual = true;}), new InstantCommand(() -> {
+  //       manipulator.cc = true;})
+  //     ));
    
-      //change to new buttons
-      new Trigger(() -> operatorController.getRawButton(7))
-    .onTrue(new SetElevatorPositionManual(true, 0.1))
-    .onFalse(new InstantCommand(() -> elevator.setOpenLoop(0), elevator));
+  //     //change to new buttons
+  //     new Trigger(() -> operatorController.getRawButton(7))
+  //   .onTrue(new SetElevatorPositionManual(true, 0.1))
+  //   .onFalse(new InstantCommand(() -> elevator.setOpenLoop(0), elevator));
 
-      new Trigger(() -> operatorController.getRawButton(11))
-      .onTrue(new SetElevatorPositionManual(false, -0.1))
-      .onFalse(new InstantCommand(() -> elevator.setOpenLoop(0)));
+  //     new Trigger(() -> operatorController.getRawButton(11))
+  //     .onTrue(new SetElevatorPositionManual(false, -0.1))
+  //     .onFalse(new InstantCommand(() -> elevator.setOpenLoop(0)));
 
-      new Trigger(() -> driverController.getLeftBumperButton())
-      .onTrue(new InstantCommand(() -> drive.zeroGyro(), drive));
+  //     new Trigger(() -> driverController.getLeftBumperButton())
+  //     .onTrue(new InstantCommand(() -> drive.resetGyro(0), drive));
+  // 
   }
 
 

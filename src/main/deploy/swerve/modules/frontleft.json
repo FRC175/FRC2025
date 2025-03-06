@@ -1,9 +1,9 @@
 {
   "location": {
-    "front": 9.25,
-    "left": -6
+    "front": 12,
+    "left": 11.75
   },
-  "absoluteEncoderOffset": 45,
+  "absoluteEncoderOffset": 360,
   "drive": {
     "type": "sparkmax_neo",
     "id": 7,
@@ -15,8 +15,8 @@
     "canbus": "rio"
   },
   "encoder": {
-    "type": "attached",
-    "id": 23,
+    "type": "cancoder",
+    "id": 13,
     "canbus": "CANivore_BUS"
   },
   "inverted": {

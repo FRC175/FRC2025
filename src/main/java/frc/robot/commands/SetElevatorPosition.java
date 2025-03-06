@@ -9,11 +9,12 @@ public class SetElevatorPosition extends Command{
     private final Elevator elevator;
     private double goalPoint;
     private double upSpeed, downSpeed, deadband, dist;
+    private elevatorSetpoint goalSet;
 
     
-    public SetElevatorPosition (double upSpeed, double downSpeed, double deadband) {
+    public SetElevatorPosition (double upSpeed, double downSpeed, double deadband, elevatorSetpoint setpoint) {
         this.elevator = Elevator.getInstance();
-        goalPoint = elevator.getGoalSetpoint().getSetpoint();
+        goalPoint = setpoint.getSetpoint();
         this.deadband = deadband;
         this.downSpeed = downSpeed;
         this.upSpeed = upSpeed;
@@ -21,6 +22,7 @@ public class SetElevatorPosition extends Command{
         
 
     }
+
 
     @Override
     public void execute() {
@@ -45,6 +47,7 @@ public class SetElevatorPosition extends Command{
     
     @Override
     public void end(boolean interrupted) {
+      System.out.println(goalPoint + " stopped");
         elevator.setOpenLoop(0);
         
     }
@@ -52,7 +55,7 @@ public class SetElevatorPosition extends Command{
     public boolean isFinished() {
       double max = ElevatorConstants.MAX_HEIGHT;
       double min = ElevatorConstants.MIN_HEIGHT;
-      if (dist - 10 <= goalPoint || dist + 10 >= goalPoint || dist >= max || dist <= min || elevator.isBotProxMade() || elevator.isTopProxMade()) {
+      if (dist - 10 <= goalPoint || dist + 10 >= goalPoint || dist >= max || dist <= min) {
         return true;
       } else {
         return false;

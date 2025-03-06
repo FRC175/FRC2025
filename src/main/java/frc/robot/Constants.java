@@ -22,7 +22,7 @@ public final class Constants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final int OPERATOR_CONTROLLER_PORT = 1;
 
-        public static final double CONTROLLER_DEADBAND = 0.1;
+      
 
         public static final double test = 0;
     }
@@ -40,7 +40,7 @@ public final class Constants {
     public static final class ElevatorConstants {
         // PLACEHOLDER VALUES. do not test until we know FOR SURE that these are correct
         public static final double MAX_HEIGHT = 1100;
-        public static final double MIN_HEIGHT = 24.5;
+        public static final double MIN_HEIGHT = 25.4;
     }
 
     
@@ -52,7 +52,6 @@ public final class Constants {
         public static final double driveDeadbandTwist = 0.3;
 
 
-        public static final int PIDGEON = 20;
 
         public static final double ENCODERTOANGLE = (double) 360/4096;
 

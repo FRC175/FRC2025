@@ -26,7 +26,7 @@ public class setManipWorking extends Command {
         upperLimit = ManipConstants.UPPER_LIMIT;
         lowerLimit = ManipConstants.LOWER_LIMIT;
         CurrentSet = manipulator.getCurrentSetpoint();
-
+        surpassedLimit = false;
         addRequirements(manipulator);
     }
 
@@ -39,16 +39,16 @@ public class setManipWorking extends Command {
     @Override
     public void execute() {
       double currentAngle = manipulator.getEncoder();
-      System.out.println(surpassedLimit);
-      if (currentAngle <= upperLimit || currentAngle >= lowerLimit) {
+      System.out.println("setpoint" + goalSet.getSetpoint());
+      if (currentAngle >= upperLimit || currentAngle <= lowerLimit) {
         manipulator.setFlipOpenLoop(0);
         surpassedLimit = true;
       }
-      if  (!(surpassedLimit || (currentAngle - deadband < goalAngle || currentAngle + deadband > goalAngle))){
+      if  ((currentAngle - deadband < goalAngle || currentAngle + deadband > goalAngle)){
         if (currentAngle - deadband < goalAngle) {
-            manipulator.setFlipOpenLoop(-0.3);
+            manipulator.setFlipOpenLoop(-0.6);
         } else if (currentAngle + deadband > goalAngle) {
-            manipulator.setFlipOpenLoop(0.3);
+            manipulator.setFlipOpenLoop(0.6);
         }
       } else {
          manipulator.setFlipOpenLoop(0);

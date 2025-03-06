@@ -14,6 +14,8 @@ public class SetElevatorPositionManual extends Command{
         this.elevator = Elevator.getInstance();
         this.goingUp = goingUp;
         this.speed = speed;
+
+        
         
 
         
@@ -28,14 +30,16 @@ public class SetElevatorPositionManual extends Command{
     
     @Override
     public void end(boolean interrupted) {
-        elevator.setOpenLoop(0);
+        elevator.setOpenLoop(-.1);
+        System.out.println("over");
         
     }
     @Override
     public boolean isFinished() {
+
       double maxheight = ElevatorConstants.MAX_HEIGHT;
       double minHeight = ElevatorConstants.MIN_HEIGHT;
-      return (dist >= maxheight|| dist <= minHeight || elevator.isBotProxMade() || elevator.isTopProxMade());
+      return (dist >= maxheight|| dist <= minHeight );
     }
 
 }

@@ -43,13 +43,15 @@ import frc.robot.utils.Utils;
 
 
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Drive.Drive;
 import frc.robot.commands.SetElevatorPosition;
 import frc.robot.commands.manipulator.Intake;
 import frc.robot.commands.manipulator.setManipWorking;
 
 import frc.robot.commands.manipulator.Discharge;
 import frc.robot.commands.SetElevatorPositionManual;
-// import frc.robot.commands.Swerve;
+import frc.robot.commands.Swerve;
+
 
 
 
@@ -74,11 +76,11 @@ public class RobotContainer {
   private final Manipulator manipulator;
 
 
-private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+//private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
 
   private static RobotContainer instance;
-
+  private final Drive drive;
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -88,6 +90,7 @@ private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.ge
     this.cage = Cage.getInstance();
     this.elevator = Elevator.getInstance();
     this.manipulator = Manipulator.getInstance();
+    this.drive = Drive.getInstance();
     
 
     driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
@@ -129,15 +132,15 @@ private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.ge
 
   private void configureDefaultCommands() {
 
-    // drive.setDefaultCommand(new Swerve(driverController, drive));
+    drive.setDefaultCommand(new Swerve(driverController, drive));
 
     // cage.setDefaultCommand(new RunCommand(() -> {
     //   cage.enableCompressor();
     // } , cage));
-    drive.setDefaultCommand(drive.driveRelativeCommand(() ->
-     MathUtil.applyDeadband(-1*driverController.getLeftX(), Constants.DriveConstants.driveDeadbandY, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
+    // drive.setDefaultCommand(drive.driveRelativeCommand(() ->
+    //  MathUtil.applyDeadband(-1*driverController.getLeftX(), Constants.DriveConstants.driveDeadbandY, Constants.DriveConstants.MAXIMUMSPEED),
+    // () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
+    // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
    
    
     //manipulator.setDefaultCommand (new setManipWorking(manipulator, .05, 0.3));

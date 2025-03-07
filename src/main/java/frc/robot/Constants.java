@@ -16,7 +16,7 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
 
-  
+  public static final double TODDLER_MODE = 0.5;
 
     public static final class ControllerConstants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
@@ -46,20 +46,36 @@ public final class Constants {
     
 
     public static final class DriveConstants {
-    
-        public static final double driveDeadbandX = 0.3;
-        public static final double driveDeadbandY = 0.3;
-        public static final double driveDeadbandTwist = 0.3;
+        public static final int frontRightDrive = 3;
+        public static final int frontRightRot = 2;
+        public static final int frontLeftDrive = 7;
+        public static final int frontLeftRot = 6;
+        public static final int backRightDrive = 5;
+        public static final int backRightRot = 4;
+        public static final int backLeftDrive = 9;
+        public static final int backLeftRot = 8;
+
+        public static final double frontRightTurnAngle = 45;
+        public static final double frontLeftTurnAngle = 135;
+        public static final double backRightTurnAngle = 315;
+        public static final double backLeftTurnAngle = 225;
+
+        public static final int frontRightEncoder = 11;
+        public static final int frontLeftEncoder = 13;
+        public static final int backRightEncoder = 12;
+        public static final int backLeftEncoder = 14;
+
+        public static final double frontRightBaseAngle = 0;
+        public static final double frontLeftBaseAngle = 0; //0.470215
+        public static final double backRightBaseAngle = 0;
+        public static final double backLeftBaseAngle = 0;
 
 
+        public static final int PIDGEON = 10;
 
         public static final double ENCODERTOANGLE = (double) 360/4096;
 
-        public static final double MAXIMUMSPEED = Units.feetToMeters(11);
-
-
     }
-
     public enum elevatorSetpoint {
         GROUND(25.4),
         L1(321),

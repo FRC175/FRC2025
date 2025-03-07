@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Drive;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkMaxAlternateEncoder;
@@ -47,7 +47,7 @@ public class SwerveModule {
         this.drive = new SparkMax(drive, MotorType.kBrushless);
         this.turn = new SparkMax(turn, MotorType.kBrushless);
         this.driveEncoder = this.drive.getEncoder();
-        this.encoder = new CANcoder(encoder);
+        this.encoder = new CANcoder(encoder, "CANivore_BUS");
         this.turnAngle = baseAngle;
         this.num = id++;
         this.goalAngle = 0;

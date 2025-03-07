@@ -65,10 +65,10 @@ public final class Constants {
         public static final int backRightEncoder = 12;
         public static final int backLeftEncoder = 14;
 
-        public static final double frontRightBaseAngle = 0;
-        public static final double frontLeftBaseAngle = 0; //0.470215
-        public static final double backRightBaseAngle = 0;
-        public static final double backLeftBaseAngle = 0;
+        public static final double frontRightBaseAngle = 0.571045 ;
+        public static final double frontLeftBaseAngle = 0.887695; //0.470215
+        public static final double backRightBaseAngle = 0.881592;
+        public static final double backLeftBaseAngle = 0.597656;
 
 
         public static final int PIDGEON = 10;

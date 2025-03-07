@@ -72,10 +72,10 @@ public class Manipulator extends SubsystemBase {
     
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("manip Encoder", getEncoder());
+       
         //SmartDashboard.putNumber("motor demand",)
-    //     System.out.println("upstream: " + upstream.get());
-    //     System.out.println("downstream: " + upstream.get());
+        System.out.println("upstream: " + upstream.get());
+        System.out.println("downstream: " + upstream.get());
     }
 
     public static Manipulator getInstance() {

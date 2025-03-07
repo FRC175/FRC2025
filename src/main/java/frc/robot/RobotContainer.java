@@ -4,55 +4,23 @@
 
 package frc.robot;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.concurrent.CyclicBarrier;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
-import edu.wpi.first.wpilibj2.command.*;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
  
 import frc.robot.Constants.ControllerConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.elevatorSetpoint;
 import frc.robot.Constants.manipulatorSetpoint;
-import frc.robot.utils.Controller;
-import frc.robot.utils.Utils;
-
 
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Drive.Drive;
-import frc.robot.commands.SetElevatorPosition;
 import frc.robot.commands.manipulator.Intake;
-import frc.robot.commands.manipulator.setManipWorking;
 
 import frc.robot.commands.manipulator.Discharge;
-import frc.robot.commands.SetElevatorPositionManual;
 import frc.robot.commands.Swerve;
-
-
 
 
 /**
@@ -65,7 +33,6 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-; 
   
   private final XboxController driverController/* , operatorController*/;
   private final XboxController operatorController;
@@ -75,13 +42,10 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Manipulator manipulator;
 
-
 //private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
-
   private static RobotContainer instance;
   private final Drive drive;
-
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -156,6 +120,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    new Trigger (() -> driverController.getLeftBumperButton())
+    .onTrue(new InstantCommand(() -> drive.resetGyro(0), drive));
+
+
     new Trigger(() -> operatorController.getBButtonPressed())
     .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.ALGAE);;}));
   
@@ -185,7 +153,7 @@ public class RobotContainer {
 
     new Trigger(() -> operatorController.getLeftBumperButton())
     .onTrue(
-      new Intake(.1, 0.03)
+      new Intake(-.1, -0.03)
     )
     .onFalse(new InstantCommand(() -> {
       manipulator.setIntakeOpenLoop(0); }, manipulator));

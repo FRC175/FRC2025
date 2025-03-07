@@ -5,15 +5,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkClosedLoopController;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
-import frc.robot.Constants.elevatorSetpoint;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ElevatorSetpoint;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
@@ -27,9 +25,8 @@ public class Elevator extends SubsystemBase {
     public boolean coralInPeril;
     public boolean coralOverride;
     public boolean manual;
-    private elevatorSetpoint goalPoint;
+    private ElevatorSetpoint goalPoint;
     private final DigitalInput topProxSwitch, botProxSwitch;
-    
 
     public Elevator() {
         this.master = new SparkMax(15, MotorType.kBrushless);
@@ -42,19 +39,17 @@ public class Elevator extends SubsystemBase {
         this.botProxSwitch = new DigitalInput(3);
         this.topProxSwitch = new DigitalInput(4);
 
-
-
-        defaultConfig
-        .inverted(false);
+        defaultConfig.inverted(false);
         configureSparks();
         configureDistSensor();
 
-       goalPoint =  elevatorSetpoint.GROUND;
+        goalPoint =  ElevatorSetpoint.GROUND;
     }
     
     @Override
     public void periodic() {
        SmartDashboard.putNumber("ele dist", getDistance());
+    //    System.out.println("Ele Dist: " + getDistance());
     }
 
     public boolean isTopProxMade () {
@@ -64,7 +59,6 @@ public class Elevator extends SubsystemBase {
     public boolean isBotProxMade () {
         return botProxSwitch.get();
     }
-    
 
     public static Elevator getInstance() {
         if ( instance == null) {
@@ -92,8 +86,10 @@ public class Elevator extends SubsystemBase {
     }
     
     public double getDistance() {
-        LaserCan.Measurement measurement = distSensor.getMeasurement();
-        return (measurement.distance_mm + -123.6) ;
+        double measurement = distSensor.getMeasurement().distance_mm - 123.6;
+        measurement = Math.min(measurement, ElevatorConstants.MAX_HEIGHT);
+        measurement = Math.max(measurement, ElevatorConstants.MIN_HEIGHT);
+        return measurement;
     }
 
     public void setOpenLoop (double demand) {
@@ -101,17 +97,12 @@ public class Elevator extends SubsystemBase {
         slave.set(demand);
     }
 
-    public elevatorSetpoint getGoalSetpoint () {
+    public ElevatorSetpoint getGoalSetpoint () {
         return goalPoint;
     }
 
-    public void setGoalPoint (elevatorSetpoint setpoint) {
+    public void setGoalPoint (ElevatorSetpoint setpoint) {
         goalPoint = setpoint;
     }
-
-
-
-   
-
 
 }

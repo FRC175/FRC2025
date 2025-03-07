@@ -22,7 +22,7 @@ import com.revrobotics.spark.config.AlternateEncoderConfig;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ManipConstants;
-import frc.robot.Constants.elevatorSetpoint;
+import frc.robot.Constants.ElevatorSetpoint;
 import frc.robot.Constants.manipulatorSetpoint;
 
 
@@ -74,8 +74,8 @@ public class Manipulator extends SubsystemBase {
     public void periodic() {
        
         //SmartDashboard.putNumber("motor demand",)
-        System.out.println("upstream: " + upstream.get());
-        System.out.println("downstream: " + upstream.get());
+        //System.out.println("upstream: " + upstream.get());
+        // System.out.println("downstream: " + upstream.get());
     }
 
     public static Manipulator getInstance() {

@@ -6,40 +6,39 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class SetElevatorPositionManual extends Command{
     private final Elevator elevator;
-    private boolean goingUp;
-    private double speed, dist;
+    private double speed, increment, goalPoint;
 
-    
-    public SetElevatorPositionManual (boolean goingUp, double speed) {
+    public SetElevatorPositionManual (double speed, double increment) {
         this.elevator = Elevator.getInstance();
-        this.goingUp = goingUp;
+        this.increment = increment;
         this.speed = speed;
+        this.goalPoint = ElevatorConstants.MIN_HEIGHT;  // just to give this a value, will be set correctly on init
+    }
 
-        
-        
-
-        
-
+    @Override
+    public void initialize() {
+      this.goalPoint = elevator.getDistance() + increment;
     }
 
     @Override
     public void execute() {
-      dist = elevator.getDistance();
-      elevator.setOpenLoop(speed);
+      double dist = elevator.getDistance();
+      if (dist <= goalPoint){
+        elevator.setOpenLoop(speed);
+      } else if (dist >= goalPoint) {
+          elevator.setOpenLoop(speed);
+      }
     }
     
     @Override
     public void end(boolean interrupted) {
-        elevator.setOpenLoop(-.1);
-        System.out.println("over");
-        
+        elevator.setOpenLoop(0);
     }
+
     @Override
     public boolean isFinished() {
-
-      double maxheight = ElevatorConstants.MAX_HEIGHT;
-      double minHeight = ElevatorConstants.MIN_HEIGHT;
-      return (dist >= maxheight|| dist <= minHeight );
+      double dist = elevator.getDistance();
+      boolean goingUp = increment > 0.0;
+      return (goingUp && dist >= goalPoint) || (!goingUp && dist <= goalPoint);
     }
-
 }

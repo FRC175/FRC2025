@@ -76,16 +76,15 @@ public final class Constants {
         public static final double ENCODERTOANGLE = (double) 360/4096;
 
     }
-    public enum elevatorSetpoint {
+    public enum ElevatorSetpoint {
         GROUND(25.4),
         L1(321),
         L2(321),
         L3(478),
         L4(722);
-        
 
         double value;
-        elevatorSetpoint(double value) {
+        ElevatorSetpoint(double value) {
                 this.value = value;
         }
 

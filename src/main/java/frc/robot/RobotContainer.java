@@ -134,9 +134,10 @@ public class RobotContainer {
     // } , cage));
     
    
-    drive.setDefaultCommand(drive.driveRelativeCommand(() ->
+    drive.setDefaultCommand(drive.driveCommand(() ->
      MathUtil.applyDeadband(-1*driverController.getLeftX(), Constants.DriveConstants.driveDeadbandY, Constants.DriveConstants.MAXIMUMSPEED),
     () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
+    () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
     () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
     
    //manipulator.setDefaultCommand (new setManipWorking(manipulator, .05, 0.3));

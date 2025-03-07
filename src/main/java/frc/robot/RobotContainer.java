@@ -106,8 +106,7 @@ public class RobotContainer {
    
     //manipulator.setDefaultCommand (new setManipWorking(manipulator, .05, 0.3));
 
-    elevator.setDefaultCommand(new InstantCommand(() -> {}, elevator));
-
+    elevator.setDefaultCommand(new SetElevatorPosition(0.2, 0.2, 50));
   }
 
   /**
@@ -130,15 +129,15 @@ public class RobotContainer {
     // .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.INTAKING);;}));
     
     new Trigger(() -> operatorController.getRawButton(3))
-      .onTrue( new SetElevatorPosition(0.20, 0.2, 12.5, ElevatorSetpoint.GROUND));
+      .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.GROUND); }));
     new Trigger(() -> operatorController.getRawButtonPressed(14))
-      .onTrue( new SetElevatorPosition(0.20, 0.2, 12.5, ElevatorSetpoint.L1));
+    .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L1); }));
     new Trigger(() -> operatorController.getRawButtonPressed(10))
-      .onTrue( new SetElevatorPosition(0.20, 0.2, 12.5, ElevatorSetpoint.L2));
+    .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L2); }));
     new Trigger(() -> operatorController.getRawButtonPressed(6))
-      .onTrue( new SetElevatorPosition(0.20, 0.2, 12.5, ElevatorSetpoint.L3));
+    .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L3); }));
     new Trigger(() -> operatorController.getRawButtonPressed(2))
-      .onTrue( new SetElevatorPosition(0.20, 0.2, 12.5, ElevatorSetpoint.L4));
+    .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L4); }));
 
     new Trigger(() -> operatorController.getRawButton(16))
       .onTrue(new Intake(-.1, -0.03))
@@ -165,10 +164,14 @@ public class RobotContainer {
    
       //change to new buttons
       new Trigger(() -> operatorController.getRawButton(7))
-        .onTrue(new SetElevatorPositionManual(0.25, 2.0));
+        .onTrue(new InstantCommand(() -> { 
+          elevator.setGoalPoint(elevator.getGoalSetpoint() + 30.0); 
+        }));
 
-      new Trigger(() -> operatorController.getRawButton(11))
-        .onTrue(new SetElevatorPositionManual(0.25, -2.0));
+        new Trigger(() -> operatorController.getRawButton(11))
+        .onTrue(new InstantCommand(() -> { 
+          elevator.setGoalPoint(elevator.getGoalSetpoint() - 30.0); 
+        }));
   }
 
   private void configureAutoChooser() { }

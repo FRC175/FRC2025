@@ -25,8 +25,8 @@ public class Elevator extends SubsystemBase {
     public boolean coralInPeril;
     public boolean coralOverride;
     public boolean manual;
-    private ElevatorSetpoint goalPoint;
     private final DigitalInput topProxSwitch, botProxSwitch;
+    private double goalPoint = 0.0;
 
     public Elevator() {
         this.master = new SparkMax(15, MotorType.kBrushless);
@@ -43,13 +43,13 @@ public class Elevator extends SubsystemBase {
         configureSparks();
         configureDistSensor();
 
-        goalPoint =  ElevatorSetpoint.GROUND;
+        goalPoint = ElevatorSetpoint.L1.getSetpoint();
     }
     
     @Override
     public void periodic() {
        SmartDashboard.putNumber("ele dist", getDistance());
-    //    System.out.println("Ele Dist: " + getDistance());
+       //System.out.println("Goal: " + getGoalSetpoint());
     }
 
     public boolean isTopProxMade () {
@@ -86,7 +86,7 @@ public class Elevator extends SubsystemBase {
     }
     
     public double getDistance() {
-        double measurement = distSensor.getMeasurement().distance_mm - 123.6;
+        double measurement = distSensor.getMeasurement().distance_mm;
         measurement = Math.min(measurement, ElevatorConstants.MAX_HEIGHT);
         measurement = Math.max(measurement, ElevatorConstants.MIN_HEIGHT);
         return measurement;
@@ -97,12 +97,15 @@ public class Elevator extends SubsystemBase {
         slave.set(demand);
     }
 
-    public ElevatorSetpoint getGoalSetpoint () {
+    public double getGoalSetpoint () {
         return goalPoint;
     }
 
     public void setGoalPoint (ElevatorSetpoint setpoint) {
-        goalPoint = setpoint;
+        goalPoint = setpoint.getSetpoint();
     }
 
+    public void setGoalPoint (double setpoint) {
+        goalPoint = setpoint;
+    }
 }

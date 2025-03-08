@@ -114,7 +114,7 @@ public class RobotContainer {
    
     manipulator.setDefaultCommand ( new setManipWorking(manipulator, .28, 0.3, 0.3));
     intake.setDefaultCommand( new runIntake(.1));
-    elevator.setDefaultCommand(new SetElevatorPosition(0.2, 0.2, 50));
+    elevator.setDefaultCommand(new SetElevatorPosition(0.3, 0.3, 50));
 
 
   }
@@ -156,11 +156,11 @@ public class RobotContainer {
     .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L4); }));
 
     new Trigger(() -> operatorController.getRawButton(16))
-      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE)))
+      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)))
       .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
     new Trigger(() -> operatorController.getRawButton(15))
-      .onTrue(new InstantCommand(() ->  intake.setState(intakePoints.DISCHARGE)))
+      .onTrue(new InstantCommand(() ->  intake.setState(intakePoints.DISCHARGE_CORAL)))
       .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
   //   new Trigger(() -> operatorController.getRawButtonPressed(5))
@@ -198,6 +198,27 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> { 
           manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
         }));
+
+        new Trigger(() -> operatorController.getRawButton(8))
+        .onTrue(new InstantCommand(() -> { 
+          manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
+        }));
+
+        new Trigger(() -> operatorController.getRawButton(5))
+        .onTrue(new InstantCommand(() -> { 
+          intake.setState(intakePoints.INTAKE_ALGAE);}))
+        
+        .onFalse (new InstantCommand(() -> { 
+          intake.setState(intakePoints.OFF);})
+        );
+
+        new Trigger(() -> operatorController.getRawButton(1))
+        .onTrue(new InstantCommand(() -> { 
+          intake.setState(intakePoints.DISCHARGEALGAE);
+        }))
+        .onFalse (new InstantCommand(() -> { 
+          intake.setState(intakePoints.OFF);})
+        );
   }
 
   private void configureAutoChooser() {

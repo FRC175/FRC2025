@@ -78,7 +78,7 @@ public final class Constants {
         L1(160),
         L2(426),
         L3(817),
-        L4(1300);
+        L4(1100);
 
         double value;
         ElevatorSetpoint(double value) {
@@ -94,12 +94,12 @@ public final class Constants {
 
     public enum manipulatorSetpoint {
         CORALIN(.27),
-        ALGAEIN( .8333),
         CORALTRAVEL(.33),
         L4CORAL(.48),
         ALGAETRAVEL(.67),
-        ALGAEPROCESSOR(.78);
-        
+        ALGAEIN(.78),
+        BARGE(.55);
+        //ALGAE IN
         
 
         double value;
@@ -116,9 +116,11 @@ public final class Constants {
 
     public enum intakePoints {
         CAPTURED,
-        INTAKE,
-        DISCHARGE,
-        OFF;
+        INTAKE_CORAL,
+        DISCHARGE_CORAL,
+        OFF,
+        DISCHARGEALGAE,
+        INTAKE_ALGAE;
 
     }
 

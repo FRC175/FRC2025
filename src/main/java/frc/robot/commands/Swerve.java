@@ -34,7 +34,7 @@ public class Swerve extends Command {
         drive.swerve(
             Utils.deadband(joy.getLeftX(), 0.1, 1 * (1-Constants.TODDLER_MODE)), 
             Utils.deadband(joy.getLeftY(), 0.1, 1 * (1-Constants.TODDLER_MODE)), 
-            Math.pow((twist * 0.85), 1), 
+            Math.pow((twist * 0.60), 1), 
             drive.getYaw());
         // drive.postEncoders();
         // drive.postYaw();

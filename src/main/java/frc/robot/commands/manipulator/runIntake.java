@@ -42,7 +42,7 @@ public class runIntake extends Command{
       boolean upstream = intake.isUpstream();
       boolean downStream = intake.isDownstream();
       intakePoints state = intake.getState();
-      if (state == intakePoints.INTAKE) {
+      if (state == intakePoints.INTAKE_CORAL) {
         intake.setIntakeOpenLoop(-demand);
         if (downStream) {
           intake.setState(intakePoints.CAPTURED);
@@ -56,11 +56,22 @@ public class runIntake extends Command{
         }
         
       }
-      if (state == intakePoints.DISCHARGE) {
-        intake.setIntakeOpenLoop(-demand); 
+      if (state == intakePoints.DISCHARGE_CORAL) {
+        if (manipulator.getEncoder() > .5) {
+          intake.setIntakeOpenLoop(demand);
+        } else {
+          intake.setIntakeOpenLoop(-demand); 
+        }
+        
       }
       if (state == intakePoints.OFF) {
         intake.setIntakeOpenLoop(0);
+      }
+      if (state == intakePoints.INTAKE_ALGAE) {
+        intake.setIntakeOpenLoop(demand);
+      }
+      if (state == intakePoints.DISCHARGEALGAE) {
+        intake.setIntakeOpenLoop(-demand);
       }
       
       // if (manipulator.getEncoder() > .5) algae = true; else algae = false;

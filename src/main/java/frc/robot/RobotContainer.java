@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
  
 import frc.robot.Constants.ControllerConstants;
@@ -22,9 +24,11 @@ import frc.robot.subsystems.Drive.Drive;
 import frc.robot.commands.manipulator.Intake;
 
 import frc.robot.commands.manipulator.Discharge;
+import frc.robot.commands.manipulator.setManipWorking;
 import frc.robot.commands.SetElevatorPosition;
 import frc.robot.commands.SetElevatorPositionManual;
 import frc.robot.commands.Swerve;
+import frc.robot.commands.Auto.leave;
 
 
 /**
@@ -104,7 +108,7 @@ public class RobotContainer {
     // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
    
    
-    //manipulator.setDefaultCommand (new setManipWorking(manipulator, .05, 0.3));
+    manipulator.setDefaultCommand (new setManipWorking(manipulator, .28, 0.3, 0.3));
 
     elevator.setDefaultCommand(new SetElevatorPosition(0.2, 0.2, 50));
   }
@@ -120,7 +124,13 @@ public class RobotContainer {
     .onTrue(new InstantCommand(() -> drive.resetGyro(0), drive));
 
     new Trigger(() -> operatorController.getRawButton(9))
-    .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.ALGAE);}));
+    .onTrue( new InstantCommand(() -> {
+      manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());}));
+    
+    new Trigger(() -> operatorController.getRawButton(13))
+    .onTrue( new InstantCommand(() -> {
+        manipulator.setGoalPoint(manipulatorSetpoint.CORALIN.getSetpoint());}));
+  
 
     //  new Trigger(() -> operatorController.getAButtonPressed())
     // .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.CORAL);;}));
@@ -129,7 +139,7 @@ public class RobotContainer {
     // .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.INTAKING);;}));
     
     new Trigger(() -> operatorController.getRawButton(3))
-      .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.GROUND); }));
+      .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.GROUND);}));
     new Trigger(() -> operatorController.getRawButtonPressed(14))
     .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L1); }));
     new Trigger(() -> operatorController.getRawButtonPressed(10))
@@ -140,11 +150,11 @@ public class RobotContainer {
     .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L4); }));
 
     new Trigger(() -> operatorController.getRawButton(16))
-      .onTrue(new Intake(-.1, -0.03))
+      .onTrue(new Intake(.2))
       .onFalse(new InstantCommand(() -> { manipulator.setIntakeOpenLoop(0); }, manipulator));
 
     new Trigger(() -> operatorController.getRawButton(15))
-      .onTrue(new Discharge(.03))
+      .onTrue(new Discharge(.2))
       .onFalse(new InstantCommand(() -> { manipulator.setIntakeOpenLoop(0); }, manipulator));
 
   //   new Trigger(() -> operatorController.getRawButtonPressed(5))
@@ -168,13 +178,26 @@ public class RobotContainer {
           elevator.setGoalPoint(elevator.getGoalSetpoint() + 30.0); 
         }));
 
-        new Trigger(() -> operatorController.getRawButton(11))
+      new Trigger(() -> operatorController.getRawButton(11))
         .onTrue(new InstantCommand(() -> { 
           elevator.setGoalPoint(elevator.getGoalSetpoint() - 30.0); 
         }));
+
+      new Trigger(() -> operatorController.getRawButton(4))
+        .onTrue(new InstantCommand(() -> { 
+          manipulator.setGoalPoint(manipulator.getGoalSetpoint() + .05); 
+        }));
+
+      new Trigger(() -> operatorController.getRawButton(8))
+        .onTrue(new InstantCommand(() -> { 
+          manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
+        }));
   }
 
-  private void configureAutoChooser() { }
+  private void configureAutoChooser() {
+    autoChooser.setDefaultOption("Nothing", new WaitCommand(0));
+    autoChooser.addOption("leave", new leave(drive));
+   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -9,69 +9,48 @@ import frc.robot.Constants.ManipConstants;
 public class setManipWorking extends Command {
     
    private final Manipulator manipulator; 
-   private final double demand;
-   private double goalAngle;
+   private final double upSpeed, downSpeed;
    private double upperLimit, lowerLimit;
-   private manipulatorSetpoint goalSet, CurrentSet;
+   private double goalPoint;
    private final double deadband;
    private boolean surpassedLimit;
     
 
-    public setManipWorking(Manipulator manipulator, double deadband, double demand) {
+    public setManipWorking(Manipulator manipulator, double deadband, double upSpeed, double downSpeed) {
         this.manipulator = manipulator;
-        this.demand = demand;
+        this.upSpeed = upSpeed;
+        this.downSpeed = downSpeed;
         this.deadband = deadband;
-        goalAngle = manipulator.getGoalSetpoint().getSetpoint();
-        goalSet = manipulator.getGoalSetpoint();
         upperLimit = ManipConstants.UPPER_LIMIT;
         lowerLimit = ManipConstants.LOWER_LIMIT;
-        CurrentSet = manipulator.getCurrentSetpoint();
-        surpassedLimit = false;
+        goalPoint = manipulator.getGoalSetpoint();
         addRequirements(manipulator);
     }
 
     @Override
     public void initialize() {
-
-        manipulator.setGoalSetpoint(goalSet);
+        surpassedLimit = false;
     }
+
 
     @Override
     public void execute() {
-      double currentAngle = manipulator.getEncoder();
-      System.out.println("setpoint" + goalSet.getSetpoint());
-      if (currentAngle >= upperLimit || currentAngle <= lowerLimit) {
-        manipulator.setFlipOpenLoop(0);
-        surpassedLimit = true;
-      }
-      if  ((currentAngle - deadband < goalAngle || currentAngle + deadband > goalAngle)){
-        if (currentAngle - deadband < goalAngle) {
-            manipulator.setFlipOpenLoop(-0.6);
-        } else if (currentAngle + deadband > goalAngle) {
-            manipulator.setFlipOpenLoop(0.6);
+        goalPoint = manipulator.getGoalSetpoint();
+        double currentAngle = manipulator.getEncoder();
+        if (currentAngle < goalPoint - deadband) {
+          manipulator.setFlipOpenLoop(-upSpeed);
+        } else if (currentAngle > goalPoint + deadband) {
+          manipulator.setFlipOpenLoop(downSpeed);
+        } else {
+          manipulator.setFlipOpenLoop(calculateProportionalOutput(currentAngle, goalPoint));
         }
-      } else {
-         manipulator.setFlipOpenLoop(0);
-          tryFlipIntake();
-
      }
 
+    private double calculateProportionalOutput(double angle, double goalPoint) {
+        double slope = (downSpeed + upSpeed) / (2 * deadband);
+        double output = (angle - goalPoint) * slope;
+        return output;
     }
-
-    private void tryFlipIntake() {
-        if (!surpassedLimit && (CurrentSet != goalSet)) {
-            
-            if(CurrentSet == manipulatorSetpoint.CORAL && goalSet == manipulatorSetpoint.ALGAE) {
-                manipulator.setFlipped(true);
-            }
-            if (CurrentSet == manipulatorSetpoint.ALGAE && (goalSet == manipulatorSetpoint.CORAL || goalSet == manipulatorSetpoint.INTAKING)) {
-                manipulator.setFlipped(false);
-            }
-
-            manipulator.setCurrentSetpoint(goalSet);
-        }
-    }
-
   
     @Override
     public void end(boolean interrupted) {

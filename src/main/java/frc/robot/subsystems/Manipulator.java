@@ -30,7 +30,6 @@ import frc.robot.Constants.manipulatorSetpoint;
 
 public class Manipulator extends SubsystemBase {
     
-    
     private static Manipulator instance;
     private final SparkMax flip, intake;
     private final SparkMaxConfig defaultConfig;
@@ -42,6 +41,7 @@ public class Manipulator extends SubsystemBase {
     private SparkAbsoluteEncoder flipEncoder;
     private DigitalInput upstream, downstream;
     private manipulatorSetpoint currentSetpoint, goalPosition;
+    private double goalPoint;
     // default position (false) is coral
 
     public Manipulator() {
@@ -65,14 +65,14 @@ public class Manipulator extends SubsystemBase {
         flipConfig
         .inverted(false)
         .setSparkMaxDataPortConfig();
-        
-        goalPosition = manipulatorSetpoint.CORAL;
-        currentSetpoint = manipulatorSetpoint.CORAL;
+        goalPoint = manipulatorSetpoint.CORALTRAVEL.getSetpoint();
+        // goalPosition = manipulatorSetpoint.CORALIN;
+        // currentSetpoint = manipulatorSetpoint.CORALIN;
     }
     
     @Override
     public void periodic() {
-       
+       SmartDashboard.putNumber("flipAngle", getEncoder());
         //SmartDashboard.putNumber("motor demand",)
         //System.out.println("upstream: " + upstream.get());
         // System.out.println("downstream: " + upstream.get());
@@ -84,12 +84,16 @@ public class Manipulator extends SubsystemBase {
         }
         return instance;
     }
+
+    public boolean isInDangerZone() {
+        return (getEncoder() < manipulatorSetpoint.CORALTRAVEL.getSetpoint());
+    }
     
-    public boolean isFlipped() {
+    public boolean isAlgae() {
         return isFlipped;
     }
 
-    public void setFlipped(boolean bool) {
+    public void setIsAlgae(boolean bool) {
         isFlipped = bool;
     }
 
@@ -113,7 +117,7 @@ public class Manipulator extends SubsystemBase {
     }
 
     public boolean isUpstream() {
-        return upstream.get();
+        return !upstream.get();
     }
 
     public double getIntakeSpeed() {
@@ -123,15 +127,15 @@ public class Manipulator extends SubsystemBase {
     }
 
     public boolean isDownstream() {
-        return downstream.get();
+        return !downstream.get();
     }
 
-    public manipulatorSetpoint getGoalSetpoint() {
-        return goalPosition;
+    public double getGoalSetpoint() {
+        return goalPoint;
     }
 
-    public void setGoalSetpoint(manipulatorSetpoint setpoint) {
-        goalPosition = setpoint;
+    public void setGoalPoint(Double setpoint) {
+        goalPoint = setpoint;
     }
 
     public manipulatorSetpoint getCurrentSetpoint() {

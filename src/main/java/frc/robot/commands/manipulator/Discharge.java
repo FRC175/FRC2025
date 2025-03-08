@@ -8,7 +8,7 @@ import frc.robot.Constants.ManipConstants;
 public class Discharge extends Command{
     private final Manipulator manipulator;
     private final Elevator elevator;
-    private boolean discharging, downStream;
+    private boolean discharging, downStream, algae;
     private double demand;
    
     
@@ -19,8 +19,6 @@ public class Discharge extends Command{
     public Discharge(double demand) {
       this.manipulator = Manipulator.getInstance();
       this.elevator = Elevator.getInstance();
-      discharging = false;
-      downStream = false;
       this.demand = -demand;
       
 
@@ -29,8 +27,16 @@ public class Discharge extends Command{
     }
 
     @Override
+    public void initialize() {
+      discharging = false;
+      downStream = false;
+    }
+
+    @Override
     public void execute() {
-      if (!manipulator.isFlipped()) {
+      if (manipulator.getEncoder() > .5) algae = true; else algae = false;
+      downStream = manipulator.isDownstream();
+      if (!algae) {
         elevator.coralInPeril = true;
         manipulator.setIntakeOpenLoop(demand);
         if (downStream) {
@@ -51,7 +57,7 @@ public class Discharge extends Command{
     }
     @Override
     public boolean isFinished() {
-      if( !manipulator.isFlipped()) {
+      if(algae) {
      return (!downStream && discharging);
       } else {
         return false;

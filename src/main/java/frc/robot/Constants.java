@@ -29,22 +29,19 @@ public final class Constants {
 
     public static final class ManipConstants {
         // PLACEHOLDER VALUES. do not test until we know FOR SURE that these are correct
-        public static final double DEFAULT_POSITION = 0.317919;
-        public static final double INTAKE_POSITION = 0.319952;
-        public static final double FLIPPED_POSITION = .8333;
+        
 
-        public static final double LOWER_LIMIT = 0.290622;
+        public static final double LOWER_LIMIT = 0.27;
         public static final double UPPER_LIMIT = 0.838988;
     }
 
     public static final class ElevatorConstants {
         // PLACEHOLDER VALUES. do not test until we know FOR SURE that these are correct
-        public static final double MAX_HEIGHT = 1100;
-        public static final double MIN_HEIGHT = 25.4;
+        public static final double MAX_HEIGHT = 1400;
+        public static final double MIN_HEIGHT = 160;
     }
 
     
-
     public static final class DriveConstants {
         public static final int frontRightDrive = 3;
         public static final int frontRightRot = 2;
@@ -78,10 +75,10 @@ public final class Constants {
     }
     public enum ElevatorSetpoint {
         GROUND(25.4),
-        L1(321),
-        L2(321),
-        L3(478),
-        L4(722);
+        L1(160),
+        L2(426),
+        L3(817),
+        L4(1300);
 
         double value;
         ElevatorSetpoint(double value) {
@@ -96,9 +93,13 @@ public final class Constants {
     }
 
     public enum manipulatorSetpoint {
-        CORAL(0.317919),
-        ALGAE( .8333),
-        INTAKING(0.319952);
+        CORALIN(.27),
+        ALGAEIN( .8333),
+        CORALTRAVEL(.33),
+        L4CORAL(.48),
+        ALGAETRAVEL(.67),
+        ALGAEPROCESSOR(.78);
+        
         
 
         double value;

@@ -8,8 +8,8 @@ import frc.robot.Constants.ManipConstants;
 public class Intake extends Command{
     private final Manipulator manipulator;
     private final Elevator elevator;
-    private boolean intaking, upStream, downStream;
-    private double highDemand, lowDemand;
+    private boolean adjusting, upStream, downStream, algae;
+    private double demand;
     
    
     
@@ -17,57 +17,58 @@ public class Intake extends Command{
     
 
     
-    public Intake(double highDemand, double lowDemand) {
+    public Intake(double demand) {
       this.manipulator = Manipulator.getInstance();
       this.elevator = Elevator.getInstance();
-      intaking = false;
+      this.demand = demand;
+      
+      addRequirements(manipulator);
+    }
+
+    @Override
+    public void initialize() {
+      adjusting = false;
       upStream = false;
       downStream = false;
-      this.highDemand = -highDemand;
-      this.lowDemand = -lowDemand;
-      
-
-      
-     
     }
 
     @Override
     public void execute() {
-      if (!manipulator.isFlipped()) {
+      if (manipulator.getEncoder() > .5) algae = true; else algae = false;
+      if (!algae) {
         boolean upstream = manipulator.isUpstream();
         boolean downStream = manipulator.isDownstream();
         elevator.coralInPeril = true;
-      
-          manipulator.setIntakeOpenLoop(highDemand);
-          intaking = true;
-          if (!upstream) {
-            manipulator.setIntakeOpenLoop(lowDemand);
-          }
-          if (downStream) {
-            manipulator.setIntakeOpenLoop(-lowDemand); 
-            intaking = false;
-          }
-       } else {
-          manipulator.setIntakeOpenLoop(-highDemand);
-          
-
+        if (!adjusting) {
+          manipulator.setIntakeOpenLoop(demand);
         }
+        if (upstream) {
+          manipulator.setIntakeOpenLoop(demand);
+        }
+        if (downStream) {
+          manipulator.setIntakeOpenLoop(-demand); 
+          adjusting = true;
+        } 
+      } else {
+        manipulator.setIntakeOpenLoop(demand);
+        adjusting = true;
+      }
     }
     
     @Override
     public void end(boolean interrupted) {
+      //System.out.println("code sucks");
       elevator.coralInPeril = false;
-        manipulator.setIntakeOpenLoop(0);
-        
+      manipulator.setIntakeOpenLoop(0);
     }
+
     @Override
     public boolean isFinished() {
-
-    if (!manipulator.isFlipped()) {
-      return (!upStream && !downStream && intaking);
-    } else {
-      return (intaking && manipulator.getIntakeSpeed() <= .1);
-    }
+      if (!algae) {
+        return (!upStream && !downStream && adjusting);
+      } else {
+        return (adjusting && manipulator.getIntakeSpeed() <= .1);
+      }
       
     }
 

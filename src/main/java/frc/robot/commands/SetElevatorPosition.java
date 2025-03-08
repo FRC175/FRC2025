@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Manipulator;
 
 public class SetElevatorPosition extends Command {
     private final Elevator elevator;
@@ -19,6 +20,12 @@ public class SetElevatorPosition extends Command {
 
     @Override
     public void execute() {
+      Manipulator manipulator = Manipulator.getInstance();
+      if (manipulator.isInDangerZone()) {
+        elevator.setOpenLoop(0);
+      }
+      
+
       goalPoint = elevator.getGoalSetpoint();
       double dist = elevator.getDistance();
       if (dist < goalPoint - deadband) {

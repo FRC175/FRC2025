@@ -134,7 +134,7 @@ public class Manipulator extends SubsystemBase {
         return goalPoint;
     }
 
-    public void setGoalPoint(Double setpoint) {
+    public void setGoalPoint(double setpoint) {
         goalPoint = setpoint;
     }
 

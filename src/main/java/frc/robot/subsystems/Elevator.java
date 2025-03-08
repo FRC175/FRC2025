@@ -106,6 +106,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setGoalPoint (double setpoint) {
+        if (setpoint > ElevatorConstants.MAX_HEIGHT || setpoint < ElevatorConstants.MIN_HEIGHT) return;
         goalPoint = setpoint;
     }
 }

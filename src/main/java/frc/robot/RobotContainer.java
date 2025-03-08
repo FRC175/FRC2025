@@ -17,13 +17,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorSetpoint;
+import frc.robot.Constants.intakePoints;
 import frc.robot.Constants.manipulatorSetpoint;
 
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Drive.Drive;
-import frc.robot.commands.manipulator.Intake;
+import frc.robot.commands.manipulator.runIntake;
 
-import frc.robot.commands.manipulator.Discharge;
+
 import frc.robot.commands.manipulator.setManipWorking;
 import frc.robot.commands.SetElevatorPosition;
 import frc.robot.commands.SetElevatorPositionManual;
@@ -49,7 +50,7 @@ public class RobotContainer {
   private final Cage cage;
   private final Elevator elevator;
   private final Manipulator manipulator;
-
+  private final Intake intake;
 //private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
   private static RobotContainer instance;
@@ -63,13 +64,14 @@ public class RobotContainer {
     this.elevator = Elevator.getInstance();
     this.manipulator = Manipulator.getInstance();
     this.drive = Drive.getInstance();
+    this.intake = Intake.getInstance();
 
     driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
     
     autoChooser = new SendableChooser<>();
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    
 
     // Configure the default commands
     configureDefaultCommands();
@@ -79,6 +81,8 @@ public class RobotContainer {
 
     // Configure auto mode
     configureAutoChooser();
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   public static RobotContainer getInstance() {
@@ -108,9 +112,11 @@ public class RobotContainer {
     // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
    
    
-    manipulator.setDefaultCommand (new setManipWorking(manipulator, .28, 0.3, 0.3));
-
+    manipulator.setDefaultCommand ( new setManipWorking(manipulator, .28, 0.3, 0.3));
+    intake.setDefaultCommand( new runIntake(.1));
     elevator.setDefaultCommand(new SetElevatorPosition(0.2, 0.2, 50));
+
+
   }
 
   /**
@@ -150,12 +156,12 @@ public class RobotContainer {
     .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L4); }));
 
     new Trigger(() -> operatorController.getRawButton(16))
-      .onTrue(new Intake(.2))
-      .onFalse(new InstantCommand(() -> { manipulator.setIntakeOpenLoop(0); }, manipulator));
+      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE)))
+      .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
     new Trigger(() -> operatorController.getRawButton(15))
-      .onTrue(new Discharge(.2))
-      .onFalse(new InstantCommand(() -> { manipulator.setIntakeOpenLoop(0); }, manipulator));
+      .onTrue(new InstantCommand(() ->  intake.setState(intakePoints.DISCHARGE)))
+      .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
   //   new Trigger(() -> operatorController.getRawButtonPressed(5))
   //   .onTrue(new RunCommand(() -> cage.collapseFunnel(), cage));
@@ -195,9 +201,11 @@ public class RobotContainer {
   }
 
   private void configureAutoChooser() {
-    autoChooser.setDefaultOption("Nothing", new WaitCommand(0));
+    autoChooser.setDefaultOption("Nothing", new ParallelCommandGroup(new WaitCommand(0), new InstantCommand(() -> drive.resetGyro(0))));
     autoChooser.addOption("leave", new leave(drive));
-   }
+   
+    SmartDashboard.putData(autoChooser);
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

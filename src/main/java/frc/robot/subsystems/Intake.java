@@ -29,10 +29,10 @@ import frc.robot.Constants.intakePoints;
 
 
 
-public class Manipulator extends SubsystemBase {
+public class Intake extends SubsystemBase {
     
-    private static Manipulator instance;
-    private final SparkMax flip;
+    private static Intake instance;
+    private final SparkMax intake;
     private final SparkMaxConfig defaultConfig;
     private final ResetMode resetMode;
     private final PersistMode persistMode;
@@ -46,11 +46,12 @@ public class Manipulator extends SubsystemBase {
     private intakePoints state;
     // default position (false) is coral
 
-    public Manipulator() {
-        this.flip = new SparkMax(17, MotorType.kBrushless);
+    public Intake() {
+        
+        this.intake = new SparkMax(18, MotorType.kBrushless);
         this.defaultConfig = new SparkMaxConfig();
-        this.flipEncoder = flip.getAbsoluteEncoder();
-        this.flipConfig = new AbsoluteEncoderConfig();
+        this.downstream = new DigitalInput(1);
+        this.upstream = new DigitalInput(2);
         resetMode = SparkBase.ResetMode.kResetSafeParameters;
         persistMode = PersistMode.kPersistParameters;
         manual = false;
@@ -62,9 +63,6 @@ public class Manipulator extends SubsystemBase {
         defaultConfig
         .inverted(false);
         configureSparks(defaultConfig, resetMode, persistMode);
-        flipConfig
-        .inverted(false)
-        .setSparkMaxDataPortConfig();
         goalPoint = manipulatorSetpoint.CORALTRAVEL.getSetpoint();
         // goalPosition = manipulatorSetpoint.CORALIN;
         // currentSetpoint = manipulatorSetpoint.CORALIN;
@@ -72,15 +70,17 @@ public class Manipulator extends SubsystemBase {
     
     @Override
     public void periodic() {
-       SmartDashboard.putNumber("flipAngle", getEncoder());
+       //SmartDashboard.putNumber("flipAngle", getEncoder());
         //SmartDashboard.putNumber("motor demand",)
+        SmartDashboard.putBoolean("upstream", upstream.get());
+        SmartDashboard.putBoolean("downstream", downstream.get());
         //System.out.println("upstream: " + upstream.get());
         // System.out.println("downstream: " + upstream.get());
     }
 
-    public static Manipulator getInstance() {
+    public static Intake getInstance() {
         if ( instance == null) {
-            instance = new Manipulator();
+            instance = new Intake();
         }
         return instance;
     }
@@ -93,59 +93,32 @@ public class Manipulator extends SubsystemBase {
         this.state = state;
     }
 
-    public boolean isInDangerZone() {
-        return (getEncoder() < manipulatorSetpoint.CORALTRAVEL.getSetpoint());
-    }
-    
-    public boolean isAlgae() {
-        return isFlipped;
+   
+   
+    public void setIntakeOpenLoop (double demand) {
+        intake.set(demand);
     }
 
-    public void setIsAlgae(boolean bool) {
-        isFlipped = bool;
+    public boolean isUpstream() {
+        return !upstream.get();
     }
 
-    public void invertFlip () {
-       SparkMaxConfig invertConfig = new SparkMaxConfig();
-        invertConfig
-        .inverted(isFlipped);
-        flip.configure(invertConfig, resetMode, persistMode);
-     }
+    public double getIntakeSpeed() {
+        RelativeEncoder encoder = intake.getEncoder();
+        return encoder.getVelocity();
 
-    
-
-    public void setFlipOpenLoop (double demand) {
-        flip.set(demand);
     }
 
-    public double getEncoder() {
-        return flipEncoder.getPosition();
+    public boolean isDownstream() {
+        return !downstream.get();
     }
 
    
 
-    public double getGoalSetpoint() {
-        return goalPoint;
-    }
-
-    public void setGoalPoint(double setpoint) {
-        goalPoint = setpoint;
-    }
-
-    public manipulatorSetpoint getCurrentSetpoint() {
-        return currentSetpoint;
-    }
-
-    public void setCurrentSetpoint(manipulatorSetpoint  setpoint) {
-        currentSetpoint = setpoint;
-    }
-
-
 
 
     private void configureSparks (SparkMaxConfig config, SparkBase.ResetMode resetMode, PersistMode persistmode) {
-        flip.configure(config, resetMode, persistMode);
-       
+        intake.configure(config, resetMode, persistMode);
     }
 
     

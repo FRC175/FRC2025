@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkRelativeEncoder;
@@ -22,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Elevator extends SubsystemBase {
     private static Elevator instance;
     private final SparkMax master, slave;
-    private final RelativeEncoder encoder;
+    private final Encoder encoder;
     private final SparkMaxConfig defaultConfig;
     private final ResetMode resetMode;
     private final PersistMode persistMode;
@@ -30,7 +32,7 @@ public class Elevator extends SubsystemBase {
     public boolean coralInPeril;
     public boolean coralOverride;
     public boolean manual;
-    private final DigitalInput topProxSwitch, botProxSwitch;
+   // private final DigitalInput topProxSwitch, botProxSwitch;
     private double goalPoint = 0.0;
 
     public Elevator() {
@@ -41,30 +43,31 @@ public class Elevator extends SubsystemBase {
         this.persistMode = PersistMode.kPersistParameters;
         this.distSensor = new LaserCan(21);
         coralOverride = false;
-        this.botProxSwitch = new DigitalInput(3);
-        this.topProxSwitch = new DigitalInput(4);
-        encoder = slave.getEncoder();
-
+        //encoder = new DigitalInput(3);
+        // this.botProxSwitch = new DigitalInput(3);
+        // this.topProxSwitch = new DigitalInput(4);
+         encoder = new Encoder(4, 3);
         defaultConfig.inverted(false);
         configureSparks();
         configureDistSensor();
+        resetEncoder();
 
         goalPoint = ElevatorSetpoint.L1.getSetpoint();
     }
     
     @Override
     public void periodic() {
-       SmartDashboard.putNumber("ele dist", getDistance());
+       SmartDashboard.putNumber("ele dist", encoder.get());
        //System.out.println("Goal: " + getGoalSetpoint());
     }
 
-    public boolean isTopProxMade () {
-        return topProxSwitch.get();
-    }
+    // public boolean isTopProxMade () {
+    //     return topProxSwitch.get();
+    // }
 
-    public boolean isBotProxMade () {
-        return botProxSwitch.get();
-    }
+    // public boolean isBotProxMade () {
+    //     return botProxSwitch.get();
+    // }
 
     public static Elevator getInstance() {
         if ( instance == null) {
@@ -77,6 +80,10 @@ public class Elevator extends SubsystemBase {
     public void configureSparks () {
         master.configure(defaultConfig, resetMode, persistMode);
         // configure sparkMAX motor controllers
+    }
+
+    public void resetEncoder() {
+        encoder.reset();
     }
     
     public void configureDistSensor () {

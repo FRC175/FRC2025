@@ -19,7 +19,7 @@ import frc.robot.subsystems.*;
  */
 public class Robot extends TimedRobot {
  
-  private Cage cage;
+  private Elevator elevator;
   //private SwerveSubsystem swerveSubsystem;
   
   private Command m_autonomousCommand;
@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     
+    
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -91,7 +92,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousExit() {
     System.out.println("Hi! this is when im called");
-    cage.enableCompressor();
+    
   }
 
   /** This function is called periodically during autonomous. */

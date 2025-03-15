@@ -27,7 +27,7 @@ public class Swerve extends Command {
 
     @Override
     public void execute() {
-        double twistDeadband = 0.35;
+        double twistDeadband = 0.45;
         double twist = Utils.deadband(joy.getRightX(), twistDeadband) * -1;
         if (twist < 0) twist = -1 + (1/(1-twistDeadband)) * (twist + 1);
         else if (twist > 0) twist = 1 + (1/(1-twistDeadband)) * (twist - 1);

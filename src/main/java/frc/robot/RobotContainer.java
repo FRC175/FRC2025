@@ -127,9 +127,9 @@ public class RobotContainer {
     new Trigger (() -> driverController.getLeftBumperButton())
     .onTrue(new InstantCommand(() -> drive.resetGyro(0), drive));
 
-    // new Trigger (() -> driverController.getRightBumperButton())
-    // .onTrue(new ParallelCommandGroup(new InstantCommand(() -> drive.setPrevYaw(drive.getYaw());)), new InstantCommand(())
-    // drive.resetGyro(0);)));
+    new Trigger (() -> driverController.getRightBumperButton())
+    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> drive.setPrevYaw(drive.getRawYaw())), new InstantCommand(() -> drive.resetGyro(0))))
+    .onFalse(new InstantCommand(() -> drive.resetGyro(drive.getPrevYaw())));
 
     new Trigger(() -> operatorController.getRawButton(9))
     .onTrue( new InstantCommand(() -> {
@@ -223,7 +223,8 @@ public class RobotContainer {
 
         new Trigger(() -> operatorController.getRawButton(3))
         .onTrue(new InstantCommand(() -> { 
-          intake.setState(intakePoints.DISCHARGEALGAE);}));
+          manipulator.setGoalPoint(manipulatorSetpoint.L4CORAL.getSetpoint());
+        }));
         
 
         new Trigger(() -> operatorController.getRawButton(1))

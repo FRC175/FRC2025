@@ -264,6 +264,14 @@ public final class Drive implements Subsystem {
         return ((pigeon.getYaw().getValueAsDouble() % 360) + 360) % 360;
     }
 
+    public double getRawYaw() {
+        return pigeon.getYaw().getValueAsDouble();
+    }
+
+    public double getPrevYaw() {
+        return prevYaw;
+    }
+
     public double getOdometryAngle() {
         if (getYaw() > 180) {
             return -(360-getYaw());

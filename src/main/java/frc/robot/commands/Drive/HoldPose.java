@@ -1,10 +1,10 @@
 package frc.robot.commands.Drive;
-// package frc.robot.commands;
 
-// import edu.wpi.first.wpilibj2.command.Command;
-// import frc.robot.subsystems.Drive.Drive;
-// public class HoldPose extends Command{
-//     private final Drive drive;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Drive.Drive;
+public class HoldPose extends Command{
+    private final Drive drive;
    
     
    
@@ -13,36 +13,36 @@ package frc.robot.commands.Drive;
     
 
     
-//     public HoldPose(double demand) {
-//       this.drive = Drive.getInstance();
+    public HoldPose(double demand) {
+      this.drive = Drive.getInstance();
       
       
 
       
      
-//     }
+    }
 
-//     @Override
-//     public void initialize() {
+    @Override
+    public void initialize() {
       
       
-//     }
+    }
 
-//     @Override
-//     public void execute() {
-//     drive.setPrevYaw(drive.getYaw());
-//      drive.resetGyro(0);
+    @Override
+    public void execute() {
+    drive.setPrevYaw(drive.getYaw());
+     drive.resetGyro(0);
 
       
-//     }
+    }
     
-//     @Override
-//     public void end(boolean interrupted) {
+    @Override
+    public void end(boolean interrupted) {
        
-//     }
-//     @Override
-//     public boolean isFinished() {
-//       return false;
-//     }
+    }
+    @Override
+    public boolean isFinished() {
+      return false;
+    }
 
-// }
+}

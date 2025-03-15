@@ -16,7 +16,7 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
 
-  public static final double TODDLER_MODE = 0.5;
+  public static final double TODDLER_MODE = 0.4;
 
     public static final class ControllerConstants {
         public static final int DRIVER_CONTROLLER_PORT = 0;

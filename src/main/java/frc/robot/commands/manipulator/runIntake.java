@@ -59,9 +59,9 @@ public class runIntake extends Command{
       }
       if (state == intakePoints.DISCHARGE_CORAL) {
         if (manipulator.getEncoder() > .5) {
-          intake.setIntakeOpenLoop(.3);
+          intake.setIntakeOpenLoop(-1);
         } else {
-          intake.setIntakeOpenLoop(-demand); 
+          intake.setIntakeOpenLoop(demand); 
           
         }
         }

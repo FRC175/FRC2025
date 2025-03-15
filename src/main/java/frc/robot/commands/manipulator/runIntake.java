@@ -1,4 +1,4 @@
-package frc.robot.commands.manipulator;
+package frc.robot.commands.Manipulator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Manipulator;
@@ -43,6 +43,7 @@ public class runIntake extends Command{
       boolean downStream = intake.isDownstream();
       intakePoints state = intake.getState();
       if (state == intakePoints.INTAKE_CORAL) {
+        
         intake.setIntakeOpenLoop(-demand);
         if (downStream) {
           intake.setState(intakePoints.CAPTURED);
@@ -58,12 +59,14 @@ public class runIntake extends Command{
       }
       if (state == intakePoints.DISCHARGE_CORAL) {
         if (manipulator.getEncoder() > .5) {
-          intake.setIntakeOpenLoop(demand);
+          intake.setIntakeOpenLoop(.3);
         } else {
           intake.setIntakeOpenLoop(-demand); 
+          
+        }
         }
         
-      }
+      
       if (state == intakePoints.OFF) {
         intake.setIntakeOpenLoop(0);
       }
@@ -71,7 +74,7 @@ public class runIntake extends Command{
         intake.setIntakeOpenLoop(demand);
       }
       if (state == intakePoints.DISCHARGEALGAE) {
-        intake.setIntakeOpenLoop(-demand);
+        intake.setIntakeOpenLoop(1);
       }
       
       // if (manipulator.getEncoder() > .5) algae = true; else algae = false;
@@ -97,7 +100,7 @@ public class runIntake extends Command{
     
     @Override
     public void end(boolean interrupted) {
-      System.out.println("code sucks");
+    
       intake.setIntakeOpenLoop(0);
     }
 
@@ -106,5 +109,6 @@ public class runIntake extends Command{
       return false;
       
     }
+
 
 }

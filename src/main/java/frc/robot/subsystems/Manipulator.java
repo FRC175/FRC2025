@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import com.revrobotics.spark.SparkMax;
@@ -10,6 +11,9 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import java.util.function.BooleanSupplier;
+
 import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
@@ -37,7 +41,7 @@ public class Manipulator extends SubsystemBase {
     private final ResetMode resetMode;
     private final PersistMode persistMode;
     private boolean isFlipped;
-    public boolean manual, cc;
+    private boolean manual;
     private AbsoluteEncoderConfig flipConfig;
     private SparkAbsoluteEncoder flipEncoder;
     private DigitalInput upstream, downstream;
@@ -54,7 +58,6 @@ public class Manipulator extends SubsystemBase {
         resetMode = SparkBase.ResetMode.kResetSafeParameters;
         persistMode = PersistMode.kPersistParameters;
         manual = false;
-        cc = false;
         state = intakePoints.OFF;
         
         isFlipped = false;
@@ -73,10 +76,7 @@ public class Manipulator extends SubsystemBase {
     @Override
     public void periodic() {
        SmartDashboard.putNumber("flipAngle", getEncoder());
-        //SmartDashboard.putNumber("motor demand",)
-        //System.out.println("upstream: " + upstream.get());
-        // System.out.println("downstream: " + upstream.get());
-    }
+       }
 
     public static Manipulator getInstance() {
         if ( instance == null) {
@@ -146,6 +146,11 @@ public class Manipulator extends SubsystemBase {
     private void configureSparks (SparkMaxConfig config, SparkBase.ResetMode resetMode, PersistMode persistmode) {
         flip.configure(config, resetMode, persistMode);
        
+    }
+
+    public BooleanSupplier isAtGoal(double deadband) {
+        BooleanSupplier isAtGoal = () -> (getEncoder() < goalPoint - deadband/2) || (getEncoder() > goalPoint + deadband/2); 
+       return isAtGoal;
     }
 
     

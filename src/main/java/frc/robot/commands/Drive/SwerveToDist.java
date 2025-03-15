@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.Drive;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,7 +60,7 @@ public class SwerveToDist extends Command {
     @Override
     public boolean isFinished() {
         boolean isDone =  Math.abs(drive.getDriveDistance()) >= targetDistance;
-        System.out.println("Is finished: " + isDone);
+       // System.out.println("Is finished: " + isDone);
         return Math.abs(drive.getDriveDistance()) >= targetDistance;
     } 
 }

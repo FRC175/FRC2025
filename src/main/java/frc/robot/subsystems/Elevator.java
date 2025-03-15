@@ -57,7 +57,7 @@ public class Elevator extends SubsystemBase {
     
     @Override
     public void periodic() {
-       SmartDashboard.putNumber("ele dist", encoder.get());
+       SmartDashboard.putNumber("ele dist", encoder.getDistance());
        //System.out.println("Goal: " + getGoalSetpoint());
     }
 
@@ -98,11 +98,13 @@ public class Elevator extends SubsystemBase {
           // attempts to configure LaserCAN, if the configuration fails, it prints an error message
     }
     
-    public double getDistance() {
-        double measurement = distSensor.getMeasurement().distance_mm;
-        measurement = Math.min(measurement, ElevatorConstants.MAX_HEIGHT);
-        measurement = Math.max(measurement, ElevatorConstants.MIN_HEIGHT);
-        return measurement;
+    public int getDistance() {
+
+        return encoder.get();
+        // double measurement = distSensor.getMeasurement().distance_mm;
+        // measurement = Math.min(measurement, ElevatorConstants.MAX_HEIGHT);
+        // measurement = Math.max(measurement, ElevatorConstants.MIN_HEIGHT);
+        // return measurement;
     }
 
     public void setOpenLoop (double demand) {

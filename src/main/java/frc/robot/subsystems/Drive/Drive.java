@@ -22,7 +22,7 @@ public final class Drive implements Subsystem {
     // These variables are final because they only need to be instantiated once (after all, you don't need to create a
     // new left master TalonSRX).
     SwerveModule frontRight, frontLeft, backRight, backLeft;
-    double lastValidAngle;
+    double lastValidAngle, prevYaw;
 
     Pigeon2 pigeon;
 
@@ -128,6 +128,7 @@ public final class Drive implements Subsystem {
     public void periodic() {
         // Get the rotation of the robot from the gyro.
         var gyroAngle = pigeon.getRotation2d();
+        
 
         // System.out.println(gyroAngle.getDegrees());
 
@@ -155,6 +156,10 @@ public final class Drive implements Subsystem {
 
     }
 
+    public void setPrevYaw(double value) {
+        prevYaw = value;
+    } 
+
     public void resetPose(Pose2d pose) {
         odometry.resetPosition(new Rotation2d(Math.toRadians(getOdometryAngle())),
             new SwerveModulePosition[] {
@@ -162,6 +167,8 @@ public final class Drive implements Subsystem {
             new SwerveModulePosition(backLeft.getDriveDistance(), new Rotation2d(Math.toRadians(backLeft.getOdometryAngle()))), new SwerveModulePosition(backRight.getDriveDistance(), new Rotation2d(Math.toRadians(backRight.getOdometryAngle())))
         }, pose);
     }
+
+    
 
     // public ChassisSpeeds[] getRobotRelativeSpeeds() {
     //     return new ChassisSpeeds[] {new ChassisSpeeds()}

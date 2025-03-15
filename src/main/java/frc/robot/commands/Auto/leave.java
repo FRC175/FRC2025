@@ -3,7 +3,7 @@ package frc.robot.commands.Auto;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.SwerveToDist;
+import frc.robot.commands.Drive.SwerveToDist;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.utils.Utils;
 

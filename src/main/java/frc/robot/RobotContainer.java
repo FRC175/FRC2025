@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -11,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
  
@@ -22,14 +22,12 @@ import frc.robot.Constants.manipulatorSetpoint;
 
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Drive.Drive;
-import frc.robot.commands.manipulator.runIntake;
-
-
-import frc.robot.commands.manipulator.setManipWorking;
-import frc.robot.commands.SetElevatorPosition;
-import frc.robot.commands.SetElevatorPositionManual;
-import frc.robot.commands.Swerve;
 import frc.robot.commands.Auto.leave;
+import frc.robot.commands.Drive.Swerve;
+import frc.robot.commands.Elevator.ControlElevator;
+import frc.robot.commands.Elevator.SetElevatorPosition;
+import frc.robot.commands.Manipulator.runIntake;
+import frc.robot.commands.Manipulator.setManipWorking;
 
 
 /**
@@ -112,9 +110,9 @@ public class RobotContainer {
     // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
    
    
-    manipulator.setDefaultCommand ( new setManipWorking(manipulator, .28, 0.3, 0.3));
+    manipulator.setDefaultCommand ( new setManipWorking(manipulator, .28, 0.5, 0.5));
     intake.setDefaultCommand( new runIntake(.1));
-    elevator.setDefaultCommand(new SetElevatorPosition(0.3, 0.45, 150));
+    elevator.setDefaultCommand(new ControlElevator(0.45, 0.45, 915));
 
 
   }
@@ -128,6 +126,10 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new Trigger (() -> driverController.getLeftBumperButton())
     .onTrue(new InstantCommand(() -> drive.resetGyro(0), drive));
+
+    // new Trigger (() -> driverController.getRightBumperButton())
+    // .onTrue(new ParallelCommandGroup(new InstantCommand(() -> drive.setPrevYaw(drive.getYaw());)), new InstantCommand(())
+    // drive.resetGyro(0);)));
 
     new Trigger(() -> operatorController.getRawButton(9))
     .onTrue( new InstantCommand(() -> {
@@ -144,16 +146,22 @@ public class RobotContainer {
     //  new Trigger(() -> operatorController.getXButtonPressed())
     // .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.INTAKING);;}));
     
-    new Trigger(() -> operatorController.getRawButton(3))
-      .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.GROUND);}));
-    new Trigger(() -> operatorController.getRawButtonPressed(14))
-    .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L1); }));
+    // new Trigger(() -> operatorController.getRawButton(3))
+    //   .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.GROUND);}));
+
+     new Trigger(() -> operatorController.getRawButtonPressed(14))
+      .onTrue( new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
+    
     new Trigger(() -> operatorController.getRawButtonPressed(10))
-    .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L2); }));
+      .onTrue( new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
+    
     new Trigger(() -> operatorController.getRawButtonPressed(6))
-    .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L3); }));
+      .onTrue( new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
+    
     new Trigger(() -> operatorController.getRawButtonPressed(2))
-    .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.L4); }));
+      .onTrue( new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
+
+
 
     new Trigger(() -> operatorController.getRawButton(16))
       .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)))
@@ -163,8 +171,9 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() ->  intake.setState(intakePoints.DISCHARGE_CORAL)))
       .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
-  //   new Trigger(() -> operatorController.getRawButtonPressed(5))
-  //   .onTrue(new RunCommand(() -> cage.collapseFunnel(), cage));
+     new Trigger(() -> operatorController.getRawButtonPressed(5))
+    .onTrue(new InstantCommand(() -> {
+      manipulator.setGoalPoint(manipulatorSetpoint.ALGAEIN.getSetpoint());}));
 
     // new Trigger(() -> operatorController.getRawButtonPressed(4))
     // .whileTrue(new ParallelCommandGroup(
@@ -181,12 +190,12 @@ public class RobotContainer {
       //change to new buttons
       new Trigger(() -> operatorController.getRawButton(7))
         .onTrue(new InstantCommand(() -> { 
-          elevator.setGoalPoint(elevator.getGoalSetpoint() + 30.0); 
+          elevator.setGoalPoint(elevator.getGoalSetpoint() + 150.0); 
         }));
 
       new Trigger(() -> operatorController.getRawButton(11))
         .onTrue(new InstantCommand(() -> { 
-          elevator.setGoalPoint(elevator.getGoalSetpoint() - 30.0); 
+          elevator.setGoalPoint(elevator.getGoalSetpoint() - 150.0); 
         }));
 
       new Trigger(() -> operatorController.getRawButton(4))
@@ -211,6 +220,11 @@ public class RobotContainer {
         .onFalse (new InstantCommand(() -> { 
           intake.setState(intakePoints.OFF);})
         );
+
+        new Trigger(() -> operatorController.getRawButton(3))
+        .onTrue(new InstantCommand(() -> { 
+          intake.setState(intakePoints.DISCHARGEALGAE);}));
+        
 
         new Trigger(() -> operatorController.getRawButton(1))
         .onTrue(new InstantCommand(() -> { 

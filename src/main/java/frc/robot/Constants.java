@@ -37,8 +37,8 @@ public final class Constants {
 
     public static final class ElevatorConstants {
         // PLACEHOLDER VALUES. do not test until we know FOR SURE that these are correct
-        public static final double MAX_HEIGHT = 1400;
-        public static final double MIN_HEIGHT = 160;
+        public static final double MAX_HEIGHT = 10650;
+        public static final double MIN_HEIGHT = 0;
     }
 
     
@@ -74,11 +74,13 @@ public final class Constants {
 
     }
     public enum ElevatorSetpoint {
-        GROUND(25.4),
-        L1(160),
-        L2(426),
-        L3(817),
-        L4(1100);
+        L1(0),
+        L2(1910),
+        PROCESSOR(1135),
+        BTM_ALGAE(2764),
+        L3(4920),
+        TOP_ALGAE(5908),
+        L4(9650);
 
         double value;
         ElevatorSetpoint(double value) {
@@ -96,9 +98,9 @@ public final class Constants {
         CORALIN(.27),
         CORALTRAVEL(.33),
         L4CORAL(.48),
-        ALGAETRAVEL(.67),
-        ALGAEIN(.78),
-        BARGE(.55);
+        ALGAEIN(.687),
+        BARGE(.55),
+        PROCESSOR(.7843);
         //ALGAE IN
         
 

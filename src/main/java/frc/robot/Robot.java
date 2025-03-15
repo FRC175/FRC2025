@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousExit() {
-    System.out.println("Hi! this is when im called");
+   
     
   }
 

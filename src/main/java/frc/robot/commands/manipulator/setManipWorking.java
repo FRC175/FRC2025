@@ -1,4 +1,6 @@
-package frc.robot.commands.manipulator;
+package frc.robot.commands.Manipulator;
+
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ManipConstants;
@@ -14,6 +16,7 @@ public class setManipWorking extends Command {
    private double goalPoint;
    private final double deadband;
    private boolean surpassedLimit;
+   public BooleanSupplier isAtGoal;
     
 
     public setManipWorking(Manipulator manipulator, double deadband, double upSpeed, double downSpeed) {
@@ -43,6 +46,7 @@ public class setManipWorking extends Command {
           manipulator.setFlipOpenLoop(downSpeed);
         } else {
           manipulator.setFlipOpenLoop(calculateProportionalOutput(currentAngle, goalPoint));
+          
         }
      }
 

@@ -17,8 +17,9 @@ public class SetElevatorPosition extends SequentialCommandGroup {
                     manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());
                 }
             }),
-            new WaitUntilCommand(manipulator.isAtGoal(.28)),
+            new WaitUntilCommand(manipulator.isAtGoal(.011)),
             new InstantCommand(() -> { elevator.setGoalPoint(setpoint); }),
+            new WaitUntilCommand(elevator.isAtGoal(100)),
             new InstantCommand(() -> {
                 if (setpoint == ElevatorSetpoint.L1) {
                     manipulator.setGoalPoint(manipulatorSetpoint.CORALIN.getSetpoint());

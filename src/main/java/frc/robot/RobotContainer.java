@@ -22,12 +22,12 @@ import frc.robot.Constants.manipulatorSetpoint;
 
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Drive.Drive;
+import frc.robot.commands.runIntake;
+import frc.robot.commands.setManipWorking;
 import frc.robot.commands.Auto.leave;
 import frc.robot.commands.Drive.Swerve;
 import frc.robot.commands.Elevator.ControlElevator;
 import frc.robot.commands.Elevator.SetElevatorPosition;
-import frc.robot.commands.Manipulator.runIntake;
-import frc.robot.commands.Manipulator.setManipWorking;
 
 
 /**
@@ -112,7 +112,7 @@ public class RobotContainer {
    
     manipulator.setDefaultCommand ( new setManipWorking(manipulator, .28, 0.5, 0.5));
     intake.setDefaultCommand( new runIntake(.1));
-    elevator.setDefaultCommand(new ControlElevator(0.45, 0.45, 915));
+    elevator.setDefaultCommand(new ControlElevator(0.05, 0.05, 915));
 
 
   }
@@ -150,16 +150,16 @@ public class RobotContainer {
     //   .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.GROUND);}));
 
      new Trigger(() -> operatorController.getRawButtonPressed(14))
-      .onTrue( new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
+      .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
     
     new Trigger(() -> operatorController.getRawButtonPressed(10))
-      .onTrue( new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
+      .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
     
     new Trigger(() -> operatorController.getRawButtonPressed(6))
-      .onTrue( new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
+      .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
     
     new Trigger(() -> operatorController.getRawButtonPressed(2))
-      .onTrue( new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
+      .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
 
 
 

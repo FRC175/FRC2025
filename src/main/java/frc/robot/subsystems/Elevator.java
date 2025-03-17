@@ -10,6 +10,9 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
@@ -123,5 +126,10 @@ public class Elevator extends SubsystemBase {
     public void setGoalPoint (double setpoint) {
         if (setpoint > ElevatorConstants.MAX_HEIGHT || setpoint < ElevatorConstants.MIN_HEIGHT) return;
         goalPoint = setpoint;
+    }
+
+     public BooleanSupplier isAtGoal(double deadband) {
+        BooleanSupplier isAtGoal = () -> (!((getDistance() < goalPoint - deadband) || (getDistance() > goalPoint + deadband))); 
+       return isAtGoal;
     }
 }

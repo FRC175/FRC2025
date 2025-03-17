@@ -76,6 +76,9 @@ public class Manipulator extends SubsystemBase {
     @Override
     public void periodic() {
        SmartDashboard.putNumber("flipAngle", getEncoder());
+       SmartDashboard.putNumber("GoalAngle", getGoalSetpoint());
+       System.out.println(!((getEncoder() < getGoalSetpoint() - .05) || (getEncoder() > getGoalSetpoint() + .05)));
+       //System.out.println(isAtGoal(.05).getAsBoolean());
        }
 
     public static Manipulator getInstance() {
@@ -149,7 +152,7 @@ public class Manipulator extends SubsystemBase {
     }
 
     public BooleanSupplier isAtGoal(double deadband) {
-        BooleanSupplier isAtGoal = () -> (getEncoder() < goalPoint - deadband/2) || (getEncoder() > goalPoint + deadband/2); 
+        BooleanSupplier isAtGoal = () -> (!((getEncoder() < getGoalSetpoint() - deadband) || (getEncoder() > getGoalSetpoint() + deadband)));
        return isAtGoal;
     }
 

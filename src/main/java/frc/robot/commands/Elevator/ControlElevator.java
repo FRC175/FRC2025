@@ -22,19 +22,22 @@ public class ControlElevator extends Command {
     @Override
     public void execute() {
       Manipulator manipulator = Manipulator.getInstance();
-      if (!manipulator.isInDangerZone()) {
-        goalPoint = elevator.getGoalSetpoint();
-        double dist = elevator.getDistance();
-        if (dist < goalPoint - deadband) {
-          elevator.setOpenLoop(-upSpeed);
-        } else if (dist > goalPoint + deadband) {
-          elevator.setOpenLoop(downSpeed);
-        } else {
-          elevator.setOpenLoop(calculateProportionalOutput(dist, goalPoint));
-        }
-    } else {
-      elevator.setOpenLoop(0);
-    }
+      
+      if (manipulator.isInDangerZone()) {
+        elevator.setOpenLoop(0);
+      }
+      
+
+      goalPoint = elevator.getGoalSetpoint();
+      double dist = elevator.getDistance();
+      if (dist < goalPoint - deadband) {
+        elevator.setOpenLoop(-upSpeed);
+      } else if (dist > goalPoint + deadband) {
+        elevator.setOpenLoop(downSpeed);
+      } else {
+        elevator.setOpenLoop(calculateProportionalOutput(dist, goalPoint));
+      }
+    
     }
 
     private double calculateProportionalOutput(double dist, double goalPoint) {

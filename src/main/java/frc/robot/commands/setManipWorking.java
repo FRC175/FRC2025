@@ -1,4 +1,4 @@
-package frc.robot.commands.Manipulator;
+package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 

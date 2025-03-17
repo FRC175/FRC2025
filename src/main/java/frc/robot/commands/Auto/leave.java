@@ -12,7 +12,7 @@ public class leave extends SequentialCommandGroup {
     public leave(Drive drive) {
         addCommands(
         new InstantCommand(() -> drive.resetGyro(180)),
-           new SwerveToDist(drive, .3, 180, 180, 12 )
+        new SwerveToDist(drive, .3, 180, 180, 12 )
         );
 
         

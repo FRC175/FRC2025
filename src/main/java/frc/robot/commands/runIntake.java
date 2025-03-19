@@ -61,7 +61,7 @@ public class runIntake extends Command{
         if (manipulator.getEncoder() > .5) {
           intake.setIntakeOpenLoop(-1);
         } else {
-          intake.setIntakeOpenLoop(demand); 
+          intake.setIntakeOpenLoop(-demand); 
           
         }
         }
@@ -71,7 +71,7 @@ public class runIntake extends Command{
         intake.setIntakeOpenLoop(0);
       }
       if (state == intakePoints.INTAKE_ALGAE) {
-        intake.setIntakeOpenLoop(demand);
+        intake.setIntakeOpenLoop(-demand);
       }
       if (state == intakePoints.DISCHARGEALGAE) {
         intake.setIntakeOpenLoop(1);

@@ -46,6 +46,7 @@ public final class Drive implements Subsystem {
         configureSparks();
 
         pigeon = new Pigeon2(DriveConstants.PIDGEON, "CANivore_BUS");
+        resetGyro(180);
 
         // SwerveModule test = new SwerveModule
 

@@ -51,6 +51,7 @@ public class Elevator extends SubsystemBase {
         // this.topProxSwitch = new DigitalInput(4);
          encoder = new Encoder(4, 3);
         defaultConfig.inverted(false);
+        defaultConfig.openLoopRampRate(.75);
         configureSparks();
         configureDistSensor();
         resetEncoder();

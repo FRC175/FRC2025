@@ -111,8 +111,8 @@ public class RobotContainer {
    
    
     manipulator.setDefaultCommand ( new setManipWorking(manipulator, .28, 0.5, 0.5));
-    intake.setDefaultCommand( new runIntake(.1));
-    elevator.setDefaultCommand(new ControlElevator(0.05, 0.05, 915));
+    intake.setDefaultCommand( new runIntake(.5));
+    elevator.setDefaultCommand(new ControlElevator(0.85, 0.45, 915));
 
 
   }

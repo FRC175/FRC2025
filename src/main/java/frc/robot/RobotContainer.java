@@ -41,8 +41,8 @@ public class RobotContainer {
   // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   
-  private final XboxController driverController/* , operatorController*/;
-  private final GenericHID operatorController;
+  private final XboxController driverController, operatorController/* , operatorController*/;
+  //private final GenericHID operatorController;
   private final SendableChooser<Command> autoChooser;
  /// private final Shuckleboard shuffleboard;
   private final Cage cage;
@@ -65,7 +65,8 @@ public class RobotContainer {
     this.intake = Intake.getInstance();
 
     driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
-    operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    //operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
     
     autoChooser = new SendableChooser<>();
 
@@ -131,89 +132,104 @@ public class RobotContainer {
     .onTrue(new ParallelCommandGroup(new InstantCommand(() -> drive.setPrevYaw(drive.getRawYaw())), new InstantCommand(() -> drive.resetGyro(0))))
     .onFalse(new InstantCommand(() -> drive.resetGyro(drive.getPrevYaw())));
 
-    new Trigger(() -> operatorController.getRawButton(9))
-    .onTrue( new InstantCommand(() -> {
-      manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());}));
+    // new Trigger(() -> operatorController.getRawButton(9))
+    // .onTrue( new InstantCommand(() -> {
+    //   manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());}));
     
-    new Trigger(() -> operatorController.getRawButton(13))
-    .onTrue( new InstantCommand(() -> {
-        manipulator.setGoalPoint(manipulatorSetpoint.CORALIN.getSetpoint());}));
+    new Trigger(() -> operatorController.getLeftBumperButtonPressed())
+      .onTrue( new InstantCommand(() -> {
+        manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());}));
+    
+    // new Trigger(() -> operatorController.getRawButton(13))
+    // .onTrue( new InstantCommand(() -> {
+    //     manipulator.setGoalPoint(manipulatorSetpoint.CORALIN.getSetpoint());}));
   
 
-    //  new Trigger(() -> operatorController.getAButtonPressed())
-    // .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.CORAL);;}));
-   
-    //  new Trigger(() -> operatorController.getXButtonPressed())
-    // .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.INTAKING);;}));
     
-    // new Trigger(() -> operatorController.getRawButton(3))
-    //   .onTrue( new InstantCommand(() -> { elevator.setGoalPoint(ElevatorSetpoint.GROUND);}));
+    //  new Trigger(() -> operatorController.getRawButtonPressed(14))
+    //   .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
 
-     new Trigger(() -> operatorController.getRawButtonPressed(14))
+     new Trigger(() -> operatorController.getPOV() == 0)
       .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
     
-    new Trigger(() -> operatorController.getRawButtonPressed(10))
+    // new Trigger(() -> operatorController.getRawButtonPressed(10))
+    //   .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
+    
+     new Trigger(() -> operatorController.getPOV() == 90)
       .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
     
-    new Trigger(() -> operatorController.getRawButtonPressed(6))
+    
+    // new Trigger(() -> operatorController.getRawButtonPressed(6))
+    //   .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
+
+    new Trigger(() -> operatorController.getPOV() == 180)
       .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
     
-    new Trigger(() -> operatorController.getRawButtonPressed(2))
+    
+    // new Trigger(() -> operatorController.getRawButtonPressed(2))
+    //   .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
+
+     new Trigger(() -> operatorController.getPOV() == 270)
       .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
+    
 
 
+    // new Trigger(() -> operatorController.getRawButton(16))
+    //   .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)))
+    //   .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
-    new Trigger(() -> operatorController.getRawButton(16))
+      new Trigger(() -> operatorController.getYButton())
       .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)))
       .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
-    new Trigger(() -> operatorController.getRawButton(15))
-      .onTrue(new InstantCommand(() ->  intake.setState(intakePoints.DISCHARGE_CORAL)))
+
+    // new Trigger(() -> operatorController.getRawButton(15))
+    //   .onTrue(new InstantCommand(() ->  intake.setState(intakePoints.DISCHARGE_CORAL)))
+    //   .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
+
+      new Trigger(() -> operatorController.getBButton())
+      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_CORAL)))
       .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
-     new Trigger(() -> operatorController.getRawButtonPressed(5))
-    .onTrue(new InstantCommand(() -> {
-      manipulator.setGoalPoint(manipulatorSetpoint.ALGAEIN.getSetpoint());}));
 
-    // new Trigger(() -> operatorController.getRawButtonPressed(4))
-    // .whileTrue(new ParallelCommandGroup(
-    //     new InstantCommand(() -> { manipulator.manual = true;}), 
-    //     new InstantCommand(() -> { manipulator.cc = false;})
-    //   ));
+    //  new Trigger(() -> operatorController.getRawButtonPressed(5))
+    // .onTrue(new InstantCommand(() -> {
+    //   manipulator.setGoalPoint(manipulatorSetpoint.ALGAEIN.getSetpoint());}));
 
-  //     new Trigger(() -> operatorController.getRawButtonPressed(8))
-  //   .whileTrue(new ParallelCommandGroup(new InstantCommand(() -> {
-  //     manipulator.manual = true;}), new InstantCommand(() -> {
-  //       manipulator.cc = true;})
-  //     ));
+      new Trigger(() -> operatorController.getRightBumperButtonPressed())
+      .onTrue(new InstantCommand(() -> {
+        manipulator.setGoalPoint(manipulatorSetpoint.ALGAEIN.getSetpoint());}));
+  
+
+   
    
       //change to new buttons
-      new Trigger(() -> operatorController.getRawButton(7))
-        .onTrue(new InstantCommand(() -> { 
-          elevator.setGoalPoint(elevator.getGoalSetpoint() + 150.0); 
-        }));
+      // new Trigger(() -> operatorController.getRawButton(7))
+      //   .onTrue(new InstantCommand(() -> { 
+      //     elevator.setGoalPoint(elevator.getGoalSetpoint() + 150.0); 
+      //   }));
 
-      new Trigger(() -> operatorController.getRawButton(11))
-        .onTrue(new InstantCommand(() -> { 
-          elevator.setGoalPoint(elevator.getGoalSetpoint() - 150.0); 
-        }));
+      // new Trigger(() -> operatorController.getRawButton(11))
+      //   .onTrue(new InstantCommand(() -> { 
+      //     elevator.setGoalPoint(elevator.getGoalSetpoint() - 150.0); 
+      //   }));
 
-      new Trigger(() -> operatorController.getRawButton(4))
-        .onTrue(new InstantCommand(() -> { 
-          manipulator.setGoalPoint(manipulator.getGoalSetpoint() + .05); 
-        }));
+      // new Trigger(() -> operatorController.getRawButton(4))
+      //   .onTrue(new InstantCommand(() -> { 
+      //     manipulator.setGoalPoint(manipulator.getGoalSetpoint() + .05); 
+      //   }));
 
-      new Trigger(() -> operatorController.getRawButton(8))
-        .onTrue(new InstantCommand(() -> { 
-          manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
-        }));
+      // new Trigger(() -> operatorController.getRawButton(8))
+      //   .onTrue(new InstantCommand(() -> { 
+      //     manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
+      //   }));
 
-        new Trigger(() -> operatorController.getRawButton(8))
-        .onTrue(new InstantCommand(() -> { 
-          manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
-        }));
+      //   new Trigger(() -> operatorController.getRawButton(8))
+      //   .onTrue(new InstantCommand(() -> { 
+      //     manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
+      //   }));
 
-        new Trigger(() -> operatorController.getRawButton(5))
+        new Trigger(() -> operatorController.getXButton())
         .onTrue(new InstantCommand(() -> { 
           intake.setState(intakePoints.INTAKE_ALGAE);}))
         
@@ -221,7 +237,7 @@ public class RobotContainer {
           intake.setState(intakePoints.OFF);})
         );
 
-        new Trigger(() -> operatorController.getRawButton(3))
+        new Trigger(() -> operatorController.getLeftTriggerAxis() > .1)
         .onTrue(new InstantCommand(() -> { 
           manipulator.setGoalPoint(manipulatorSetpoint.L4CORAL.getSetpoint());
         }));

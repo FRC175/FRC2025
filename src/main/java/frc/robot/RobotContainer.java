@@ -243,13 +243,13 @@ public class RobotContainer {
         }));
         
 
-        new Trigger(() -> operatorController.getRawButton(1))
-        .onTrue(new InstantCommand(() -> { 
-          intake.setState(intakePoints.DISCHARGEALGAE);
-        }))
-        .onFalse (new InstantCommand(() -> { 
-          intake.setState(intakePoints.OFF);})
-        );
+        // new Trigger(() -> operatorController.getRawButton(1))
+        // .onTrue(new InstantCommand(() -> { 
+        //   intake.setState(intakePoints.DISCHARGEALGAE);
+        // }))
+        // .onFalse (new InstantCommand(() -> { 
+        //   intake.setState(intakePoints.OFF);})
+        // );
   }
 
   private void configureAutoChooser() {

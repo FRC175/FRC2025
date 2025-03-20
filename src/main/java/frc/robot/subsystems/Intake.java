@@ -118,7 +118,7 @@ public class Intake extends SubsystemBase {
 
 
     private void configureSparks (SparkMaxConfig config, SparkBase.ResetMode resetMode, PersistMode persistmode) {
-        intake.configure(config, resetMode, persistMode);
+        intake.configure(config, resetMode, persistmode);
     }
 
     

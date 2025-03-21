@@ -208,4 +208,10 @@ public class SwerveModule {
     public boolean isReversed() {
         return reversed;
     }
+
+    // Returns meters per second of module
+    public double getVelocity() {
+    
+        return (0.4728678/encoder.getVelocity().getValueAsDouble());
+    }
 }

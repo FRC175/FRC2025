@@ -5,6 +5,9 @@
 package frc.robot;
 
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -28,6 +31,8 @@ import frc.robot.commands.Auto.leave;
 import frc.robot.commands.Drive.Swerve;
 import frc.robot.commands.Elevator.ControlElevator;
 import frc.robot.commands.Elevator.SetElevatorPosition;
+
+
 
 
 /**
@@ -68,9 +73,10 @@ public class RobotContainer {
     //operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
     operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
     
-    autoChooser = new SendableChooser<>();
+    autoChooser = AutoBuilder.buildAutoChooser();
 
-    
+    // Register Pathplanner
+    registerCommandsAuto();
 
     // Configure the default commands
     configureDefaultCommands();
@@ -79,7 +85,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure auto mode
-    configureAutoChooser();
+  
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -92,11 +98,15 @@ public class RobotContainer {
     return instance;
   }
 
-  // public void registerCommandsAuto() {
-  //     //NamedCommands.registerCommand("SwerveToTag", new SwerveToTag(drive));
-  //     NamedCommands.registerCommand("Intake", new Intake(.03, .01));
-  //     NamedCommands.registerCommand("Discharge", new Discharge(.03));
-  // }
+  public void registerCommandsAuto() {
+      //NamedCommands.registerCommand("SwerveToTag", new SwerveToTag(drive));
+      NamedCommands.registerCommand("Intake", new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)));
+      NamedCommands.registerCommand("Discharge", new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_CORAL)));
+      NamedCommands.registerCommand("L1", new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
+      NamedCommands.registerCommand("L2", new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
+      NamedCommands.registerCommand("L3", new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
+      NamedCommands.registerCommand("L4", new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
+  }
 
   private void configureDefaultCommands() {
 
@@ -252,12 +262,7 @@ public class RobotContainer {
         // );
   }
 
-  private void configureAutoChooser() {
-    autoChooser.setDefaultOption("Nothing", new ParallelCommandGroup(new WaitCommand(0), new InstantCommand(() -> drive.resetGyro(0))));
-    autoChooser.addOption("leave", new leave(drive));
-   
-    SmartDashboard.putData(autoChooser);
-  }
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

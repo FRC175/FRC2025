@@ -6,14 +6,21 @@ import frc.robot.subsystems.Drive.SwerveModule;
 import frc.robot.utils.Vector;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -30,6 +37,7 @@ public final class Drive implements Subsystem {
     SwerveDriveKinematics kinematics;
     SwerveDriveOdometry odometry;
     Pose2d pose;
+    RobotConfig config;
     
     /**
      * The single instance of {@link Drive} used to implement the "singleton" design pattern. A description of the
@@ -71,6 +79,39 @@ public final class Drive implements Subsystem {
             }, pose);
 
         lastValidAngle = 0;
+
+    
+        try{
+          config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+         // Handle exception as needed
+            e.printStackTrace();
+        }
+
+        AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> swerve(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+  
 
         resetDistance();
     }
@@ -134,6 +175,7 @@ public final class Drive implements Subsystem {
         // System.out.println(gyroAngle.getDegrees());
 
         // Update the pose
+    
         pose = odometry.update(new Rotation2d(Math.toRadians(getOdometryAngle())),
         new SwerveModulePosition[] {
             new SwerveModulePosition(frontLeft.getDriveDistance(), new Rotation2d(Math.toRadians(frontLeft.getOdometryAngle()))), new SwerveModulePosition(frontRight.getDriveDistance(), new Rotation2d(Math.toRadians(frontRight.getOdometryAngle()))),
@@ -196,6 +238,19 @@ public final class Drive implements Subsystem {
         frontLeft.setOutputs();
         backRight.setOutputs();
         backLeft.setOutputs();
+    }
+
+    public void swerve(ChassisSpeeds speeds) {
+        SwerveModule[] modules = new SwerveModule[]{frontRight, frontLeft, backRight, backLeft}; 
+        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getGyro());
+        SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
+        for (int i = 0; i < 4; i++) {
+            Vector transversal = new Vector(Math.cos(moduleStates[i].angle.getRadians()), Math.sin(moduleStates[i].angle.getRadians()));
+            modules[i].calculateRawOutputs(transversal, new Vector(0, 0));
+        }
+
+
+
     }
 
     public void lockSwerve(double joyX, double joyY, double lockAngle, double gyroAngle) {
@@ -293,9 +348,25 @@ public final class Drive implements Subsystem {
         frontLeft.resetDriveEncoder();
     }
 
-    public Translation2d getPose() {
-        return pose.getTranslation();
+    public Pose2d getPose() {
+        return pose;
     }
+
+    private ChassisSpeeds getRobotRelativeSpeeds() {
+
+        SwerveModuleState[] moduleStates = new SwerveModuleState[] {
+            new SwerveModuleState(frontRight.getVelocity(), new Rotation2d(Math.toRadians(frontRight.getOdometryAngle()))),
+            new SwerveModuleState(frontLeft.getVelocity(), new Rotation2d(Math.toRadians(frontLeft.getOdometryAngle()))),
+            new SwerveModuleState(backRight.getVelocity(), new Rotation2d(Math.toRadians(backRight.getOdometryAngle()))),
+            new SwerveModuleState(backLeft.getVelocity(), new Rotation2d(Math.toRadians(backLeft.getOdometryAngle())))
+          };
+
+          return ChassisSpeeds.fromFieldRelativeSpeeds(kinematics.toChassisSpeeds(moduleStates), getGyro());
+    }
+    
+    
+
+    
 
    
 }

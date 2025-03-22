@@ -30,7 +30,7 @@ public class SwerveModule {
     private boolean reversed;
     private boolean reverseDistance;
 
-    private static double[] vectorMagnitudes = new double[4]; //FR,FL,BR,BL
+    public static double[] vectorMagnitudes = new double[4]; //FR,FL,BR,BL
     private static double[] vectorRotations = new double[4];
     
     /**

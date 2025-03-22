@@ -77,7 +77,7 @@ public class Manipulator extends SubsystemBase {
     public void periodic() {
        SmartDashboard.putNumber("flipAngle", getEncoder());
        SmartDashboard.putNumber("GoalAngle", getGoalSetpoint());
-       System.out.println(!((getEncoder() < getGoalSetpoint() - .05) || (getEncoder() > getGoalSetpoint() + .05)));
+       //System.out.println(!((getEncoder() < getGoalSetpoint() - .05) || (getEncoder() > getGoalSetpoint() + .05)));
        //System.out.println(isAtGoal(.05).getAsBoolean());
        }
 

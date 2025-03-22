@@ -29,7 +29,7 @@ public final class Drive implements Subsystem {
     // These variables are final because they only need to be instantiated once (after all, you don't need to create a
     // new left master TalonSRX).
     SwerveModule frontRight, frontLeft, backRight, backLeft;
-    double lastValidAngle, prevYaw;
+    double lastValidAngle, prevYaw, x, y;
 
     Pigeon2 pigeon;
 
@@ -175,7 +175,11 @@ public final class Drive implements Subsystem {
         // System.out.println(gyroAngle.getDegrees());
 
         // Update the pose
-    
+        SmartDashboard.putNumberArray("vectors", SwerveModule.vectorMagnitudes);
+        SmartDashboard.putNumber("x", x);
+        SmartDashboard.putNumber("y", y);
+
+
         pose = odometry.update(new Rotation2d(Math.toRadians(getOdometryAngle())),
         new SwerveModulePosition[] {
             new SwerveModulePosition(frontLeft.getDriveDistance(), new Rotation2d(Math.toRadians(frontLeft.getOdometryAngle()))), new SwerveModulePosition(frontRight.getDriveDistance(), new Rotation2d(Math.toRadians(frontRight.getOdometryAngle()))),
@@ -245,7 +249,9 @@ public final class Drive implements Subsystem {
         speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getGyro());
         SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
         for (int i = 0; i < 4; i++) {
-            Vector transversal = new Vector(Math.cos(moduleStates[i].angle.getRadians()), Math.sin(moduleStates[i].angle.getRadians()));
+            x = Math.cos(moduleStates[i].angle.getRadians());
+            y = Math.sin(moduleStates[i].angle.getRadians());
+            Vector transversal = new Vector(x, y);
             modules[i].calculateRawOutputs(transversal, new Vector(0, 0));
         }
 

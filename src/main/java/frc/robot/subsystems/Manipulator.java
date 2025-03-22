@@ -40,7 +40,7 @@ public class Manipulator extends SubsystemBase {
     private final SparkMaxConfig defaultConfig;
     private final ResetMode resetMode;
     private final PersistMode persistMode;
-    private boolean isFlipped;
+    
     private boolean manual;
     private AbsoluteEncoderConfig flipConfig;
     private SparkAbsoluteEncoder flipEncoder;
@@ -60,14 +60,12 @@ public class Manipulator extends SubsystemBase {
         manual = false;
         state = intakePoints.OFF;
         
-        isFlipped = false;
+        
 
         defaultConfig
         .inverted(false);
         configureSparks(defaultConfig, resetMode, persistMode);
-        flipConfig
-        .inverted(false)
-        .setSparkMaxDataPortConfig();
+       
         goalPoint = manipulatorSetpoint.CORALTRAVEL.getSetpoint();
         // goalPosition = manipulatorSetpoint.CORALIN;
         // currentSetpoint = manipulatorSetpoint.CORALIN;
@@ -99,19 +97,11 @@ public class Manipulator extends SubsystemBase {
     public boolean isInDangerZone() {
         return (getEncoder() < manipulatorSetpoint.CORALTRAVEL.getSetpoint());
     }
-    
-    public boolean isAlgae() {
-        return isFlipped;
-    }
-
-    public void setIsAlgae(boolean bool) {
-        isFlipped = bool;
-    }
-
+  
     public void invertFlip () {
        SparkMaxConfig invertConfig = new SparkMaxConfig();
         invertConfig
-        .inverted(isFlipped);
+        .inverted(false);
         flip.configure(invertConfig, resetMode, persistMode);
      }
 

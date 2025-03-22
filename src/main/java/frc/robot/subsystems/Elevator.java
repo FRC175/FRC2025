@@ -45,7 +45,7 @@ public class Elevator extends SubsystemBase {
         this.resetMode = SparkBase.ResetMode.kResetSafeParameters;
         this.persistMode = PersistMode.kPersistParameters;
         this.distSensor = new LaserCan(21);
-        coralOverride = false;
+        
         //encoder = new DigitalInput(3);
         // this.botProxSwitch = new DigitalInput(3);
         // this.topProxSwitch = new DigitalInput(4);
@@ -53,7 +53,7 @@ public class Elevator extends SubsystemBase {
         defaultConfig.inverted(false);
         defaultConfig.openLoopRampRate(.75);
         configureSparks();
-        configureDistSensor();
+        //
         resetEncoder();
 
         goalPoint = ElevatorSetpoint.L1.getSetpoint();
@@ -62,6 +62,7 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
        SmartDashboard.putNumber("ele dist", encoder.getDistance());
+      
        //System.out.println("Goal: " + getGoalSetpoint());
     }
 
@@ -90,17 +91,17 @@ public class Elevator extends SubsystemBase {
         encoder.reset();
     }
     
-    public void configureDistSensor () {
-        try {
-            distSensor.setRangingMode(LaserCan.RangingMode.LONG);
-            distSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
-            distSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
-          } catch (ConfigurationFailedException e) {
-            System.out.println("!LaserCAN config failed! " + e);
-          }
+    // public void configureDistSensor () {
+    //     try {
+    //         distSensor.setRangingMode(LaserCan.RangingMode.LONG);
+    //         distSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
+    //         distSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+    //       } catch (ConfigurationFailedException e) {
+    //         System.out.println("!LaserCAN config failed! " + e);
+    //       }
 
-          // attempts to configure LaserCAN, if the configuration fails, it prints an error message
-    }
+    //       // attempts to configure LaserCAN, if the configuration fails, it prints an error message
+    // }
     
     public int getDistance() {
 

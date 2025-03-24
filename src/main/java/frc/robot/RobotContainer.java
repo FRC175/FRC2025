@@ -5,16 +5,26 @@
 package frc.robot;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
  
@@ -58,6 +68,9 @@ public class RobotContainer {
   
   private static RobotContainer instance;
   private final Drive drive;
+  private final Field2d field;
+
+  private PathPlannerLogging pLogging;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -68,12 +81,19 @@ public class RobotContainer {
     this.manipulator = Manipulator.getInstance();
     this.drive = Drive.getInstance();
     this.intake = Intake.getInstance();
+    this.field = new Field2d();
+
+    pLogging = new PathPlannerLogging();
 
     driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     //operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
     operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
-    
-    autoChooser = AutoBuilder.buildAutoChooser();
+
+  
+
+
+
+    autoChooser = new SendableChooser<>();
 
     // Register Pathplanner
     registerCommandsAuto();
@@ -85,9 +105,39 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure auto mode
+
   
 
+    SmartDashboard.putData("Field", field);
+
+
+    // Logging callback for target robot pose
+    PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+        // Do whatever you want with the pose here
+        field.getObject("target pose").setPose(pose);
+    });
+
+    // Logging callback for current robot pose
+    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
+        // Do whatever you want with the pose here
+        field.setRobotPose(pose);
+    });
+
+     // Logging callback for the active path, this is sent as a list of poses
+     PathPlannerLogging.setLogActivePathCallback((poses) -> {
+        // Do whatever you want with the poses here
+        field.getObject("path").setPoses(poses);
+    });
+        
+
+       
+  
+    
     SmartDashboard.putData("Auto Chooser", autoChooser);
+    
+
+        // Logging callback for the active path, this is sent as a list of poses
+        
   }
 
   public static RobotContainer getInstance() {
@@ -97,6 +147,9 @@ public class RobotContainer {
 
     return instance;
   }
+
+  
+  
 
   public void registerCommandsAuto() {
       //NamedCommands.registerCommand("SwerveToTag", new SwerveToTag(drive));
@@ -121,7 +174,7 @@ public class RobotContainer {
     // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
    
    
-    manipulator.setDefaultCommand ( new setManipWorking(manipulator, .28, 0.5, 0.5));
+    manipulator.setDefaultCommand ( new setManipWorking(manipulator, .1, 0.5, 0.5));
     intake.setDefaultCommand( new runIntake(.5));
     elevator.setDefaultCommand(new ControlElevator(0.85, 0.45, 915));
 
@@ -201,6 +254,13 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_CORAL)))
       .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
+      new Trigger(() -> operatorController.getXButton())
+      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE_ALGAE)))
+      .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
+
+      new Trigger(() -> operatorController.getAButton())
+      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.DISCHARGEALGAE)))
+      .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
     //  new Trigger(() -> operatorController.getRawButtonPressed(5))
     // .onTrue(new InstantCommand(() -> {
@@ -262,6 +322,14 @@ public class RobotContainer {
         // );
   }
 
+  private void configureAutoChooser() {
+    autoChooser.setDefaultOption("Nothing", new ParallelCommandGroup(new WaitCommand(0), new InstantCommand(() -> drive.resetGyro(0))));
+    autoChooser.addOption("leave", new leave(drive));
+    autoChooser.addOption("CenterL4", new leave(drive));
+   
+    SmartDashboard.putData(autoChooser);
+  }
+
   
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -269,7 +337,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+
     // An ExampleCommand will run in autonomous
+    
     return autoChooser.getSelected();
   }
 }

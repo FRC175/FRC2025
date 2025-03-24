@@ -8,9 +8,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import au.grapplerobotics.CanBridge;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Drive.Drive;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -20,11 +22,14 @@ import frc.robot.subsystems.*;
 public class Robot extends TimedRobot {
  
   private Elevator elevator;
+  private Drive drive;
+
   //private SwerveSubsystem swerveSubsystem;
   
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+   private final Field2d m_field = new Field2d();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -32,7 +37,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-
     
     
     
@@ -51,7 +55,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    
     SmartDashboard.updateValues();
+
 
     // this.cage = cage.getInstance();
     // System.out.println("huhu" + cage.getSensor());
@@ -126,9 +132,14 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    this.drive = Drive.getInstance();
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+
+    
+  }
 }

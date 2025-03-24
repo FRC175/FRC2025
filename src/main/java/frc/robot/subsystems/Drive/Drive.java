@@ -5,11 +5,18 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Drive.SwerveModule;
 import frc.robot.utils.Vector;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,15 +28,19 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public final class Drive implements Subsystem {
 
+
     // These variables are final because they only need to be instantiated once (after all, you don't need to create a
     // new left master TalonSRX).
     SwerveModule frontRight, frontLeft, backRight, backLeft;
-    double lastValidAngle, prevYaw, x, y;
+    double lastValidAngle, prevYaw;
+
+    public double x, y, velo;
 
     Pigeon2 pigeon;
 
@@ -38,6 +49,11 @@ public final class Drive implements Subsystem {
     SwerveDriveOdometry odometry;
     Pose2d pose;
     RobotConfig config;
+    Field2d field;
+    SparkMaxConfig defaultConfig;
+    ResetMode resetMode;
+    PersistMode persistMode;
+   
     
     /**
      * The single instance of {@link Drive} used to implement the "singleton" design pattern. A description of the
@@ -46,6 +62,8 @@ public final class Drive implements Subsystem {
     private static Drive instance;
     
     private Drive() {
+
+        
         // leftMaster = new CANSparkMax(DriveConstants.LEFT_MASTER_PORT, CANSparkMaxLowLevel.MotorType.kBrushless);
         frontRight = new SwerveModule(DriveConstants.frontRightDrive, DriveConstants.frontRightRot, DriveConstants.frontRightEncoder, DriveConstants.frontRightTurnAngle, DriveConstants.frontRightBaseAngle, true);
         frontLeft = new SwerveModule(DriveConstants.frontLeftDrive, DriveConstants.frontLeftRot, DriveConstants.frontLeftEncoder, DriveConstants.frontLeftTurnAngle, DriveConstants.frontLeftBaseAngle, false);
@@ -55,6 +73,8 @@ public final class Drive implements Subsystem {
 
         pigeon = new Pigeon2(DriveConstants.PIDGEON, "CANivore_BUS");
         resetGyro(180);
+       
+        field = new Field2d();
 
         // SwerveModule test = new SwerveModule
 
@@ -62,6 +82,7 @@ public final class Drive implements Subsystem {
 
         final double HALF_WHEEL_BASE_WIDTH = 0.299; // meters
 
+       
 
         frontRightLocation = new Translation2d(HALF_WHEEL_BASE_WIDTH, -HALF_WHEEL_BASE_WIDTH);
         frontLeftLocation = new Translation2d(HALF_WHEEL_BASE_WIDTH, HALF_WHEEL_BASE_WIDTH);
@@ -81,38 +102,13 @@ public final class Drive implements Subsystem {
         lastValidAngle = 0;
 
     
-        try{
-          config = RobotConfig.fromGUISettings();
-        } catch (Exception e) {
-         // Handle exception as needed
-            e.printStackTrace();
-        }
+    defaultConfig.inverted(false);
+    defaultConfig.openLoopRampRate(.05);
+    defaultConfig.idleMode(IdleMode.kBrake);
 
-        AutoBuilder.configure(
-            this::getPose, // Robot pose supplier
-            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            (speeds, feedforwards) -> swerve(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-            ),
-            config, // The robot configuration
-            () -> {
-              // Boolean supplier that controls when the path will be mirrored for the red alliance
-              // This will flip the path being followed to the red side of the field.
-              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-              var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
-            },
-            this // Reference to this subsystem to set requirements
-    );
+        
   
-
+    SmartDashboard.putData("field", field);
         resetDistance();
     }
 
@@ -140,8 +136,10 @@ public final class Drive implements Subsystem {
      * Helper method that configures the Spark Max motor controllers.
      */
     private void configureSparks() {
-
-        
+        frontLeft.configureSparks(defaultConfig, resetMode, persistMode);
+        frontRight.configureSparks(defaultConfig, resetMode, persistMode);
+        backLeft.configureSparks(defaultConfig, resetMode, persistMode);
+        backRight.configureSparks(defaultConfig, resetMode, persistMode);
     }
 
     public Rotation2d getGyro() {
@@ -168,6 +166,9 @@ public final class Drive implements Subsystem {
 
     @Override
     public void periodic() {
+
+        field.setRobotPose(pose);
+
         // Get the rotation of the robot from the gyro.
         var gyroAngle = pigeon.getRotation2d();
         
@@ -179,12 +180,17 @@ public final class Drive implements Subsystem {
         SmartDashboard.putNumber("x", x);
         SmartDashboard.putNumber("y", y);
 
+    
+        
+       
 
         pose = odometry.update(new Rotation2d(Math.toRadians(getOdometryAngle())),
         new SwerveModulePosition[] {
             new SwerveModulePosition(frontLeft.getDriveDistance(), new Rotation2d(Math.toRadians(frontLeft.getOdometryAngle()))), new SwerveModulePosition(frontRight.getDriveDistance(), new Rotation2d(Math.toRadians(frontRight.getOdometryAngle()))),
             new SwerveModulePosition(backLeft.getDriveDistance(), new Rotation2d(Math.toRadians(backLeft.getOdometryAngle()))), new SwerveModulePosition(backRight.getDriveDistance(), new Rotation2d(Math.toRadians(backRight.getOdometryAngle())))
         });
+
+       
 
         // System.out.println("FL: " + frontLeft.getDriveDistance() + "\t\t" + frontLeft.isReversed());
         // System.out.println("FR: " + frontRight.getDriveDistance() + "\t\t" + frontRight.isReversed());
@@ -251,6 +257,7 @@ public final class Drive implements Subsystem {
         for (int i = 0; i < 4; i++) {
             x = Math.cos(moduleStates[i].angle.getRadians());
             y = Math.sin(moduleStates[i].angle.getRadians());
+            velo = moduleStates[i].speedMetersPerSecond;
             Vector transversal = new Vector(x, y);
             modules[i].calculateRawOutputs(transversal, new Vector(0, 0));
         }
@@ -356,6 +363,12 @@ public final class Drive implements Subsystem {
 
     public Pose2d getPose() {
         return pose;
+    }
+
+    public Supplier<Pose2d> getPoseSup() {
+        Supplier<Pose2d> pose = () -> (getPose());
+        return pose;
+
     }
 
     private ChassisSpeeds getRobotRelativeSpeeds() {

@@ -20,10 +20,10 @@ public class runIntake extends Command{
     
 
     
-    public runIntake(double demand) {
+    public runIntake(double intDemand) {
       this.manipulator = Manipulator.getInstance();
       this.elevator = Elevator.getInstance();
-      this.demand = demand;
+      this.demand = intDemand;
       this.intake = Intake.getInstance();
       
       addRequirements(intake);
@@ -39,19 +39,21 @@ public class runIntake extends Command{
 
     @Override
     public void execute() {
+      System.out.println(demand);
       boolean upstream = intake.isUpstream();
       boolean downStream = intake.isDownstream();
       intakePoints state = intake.getState();
+
       if (state == intakePoints.INTAKE_CORAL) {
         
-        intake.setIntakeOpenLoop(-demand);
+        intake.setIntakeOpenLoop(-.1);
         if (downStream) {
           intake.setState(intakePoints.CAPTURED);
         }
       }
       if (state == intakePoints.CAPTURED) {
         if (downStream) {
-          intake.setIntakeOpenLoop(demand);
+          intake.setIntakeOpenLoop(.1);
         } else {
           intake.setIntakeOpenLoop (0);
         }
@@ -61,7 +63,7 @@ public class runIntake extends Command{
         if (manipulator.getEncoder() > .5) {
           intake.setIntakeOpenLoop(-1);
         } else {
-          intake.setIntakeOpenLoop(-demand); 
+          intake.setIntakeOpenLoop(-.5); 
           
         }
         }
@@ -71,10 +73,10 @@ public class runIntake extends Command{
         intake.setIntakeOpenLoop(0);
       }
       if (state == intakePoints.INTAKE_ALGAE) {
-        intake.setIntakeOpenLoop(-demand);
+        intake.setIntakeOpenLoop(1);
       }
       if (state == intakePoints.DISCHARGEALGAE) {
-        intake.setIntakeOpenLoop(1);
+        intake.setIntakeOpenLoop(-1);
       }
       
       // if (manipulator.getEncoder() > .5) algae = true; else algae = false;

@@ -9,20 +9,35 @@ import frc.robot.Constants.ElevatorSetpoint;
 import frc.robot.subsystems.Elevator;
 
 public class SetElevatorPosition extends SequentialCommandGroup {
-
+    private ElevatorSetpoint setp;
     public SetElevatorPosition(Manipulator manipulator, Elevator elevator, ElevatorSetpoint setpoint) {
+        this.setp = setpoint;
         addCommands(
             new InstantCommand(() -> {
                 if (manipulator.getEncoder() < manipulatorSetpoint.CORALTRAVEL.getSetpoint()) {
                     manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());
                 }
             }),
+            new InstantCommand(() -> { if (manipulator.getEncoder() > .5) {
+                if (setpoint == ElevatorSetpoint.L1) {
+                    setp = ElevatorSetpoint.PROCESSOR;
+                }
+                if (setpoint == ElevatorSetpoint.L2) {
+                    setp = ElevatorSetpoint.BTM_ALGAE;
+                }
+                if (setpoint == ElevatorSetpoint.L3) {
+                    setp = ElevatorSetpoint.TOP_ALGAE;
+                }
+            }}),
             new WaitUntilCommand(manipulator.isAtGoal(.011)),
-            new InstantCommand(() -> { elevator.setGoalPoint(setpoint); }),
+            new InstantCommand(() -> { elevator.setGoalPoint(setpoint);}),
             new WaitUntilCommand(elevator.isAtGoal(100)),
             new InstantCommand(() -> {
                 if (setpoint == ElevatorSetpoint.L1) {
                     manipulator.setGoalPoint(manipulatorSetpoint.CORALIN.getSetpoint());
+                }
+                if (setpoint == ElevatorSetpoint.PROCESSOR) {
+                    manipulator.setGoalPoint(manipulatorSetpoint.PROCESSOR.getSetpoint());
                 }
             })
             // new InstantCommand(() -> {

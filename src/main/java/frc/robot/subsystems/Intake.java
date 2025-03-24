@@ -10,6 +10,9 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import java.util.function.BooleanSupplier;
+
 import com.fasterxml.jackson.databind.node.DoubleNode;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
@@ -114,7 +117,10 @@ public class Intake extends SubsystemBase {
     }
 
    
-
+    public BooleanSupplier isCaptured () {
+        BooleanSupplier captured = () -> (getState() == intakePoints.CAPTURED);
+        return captured;
+    }
 
 
     private void configureSparks (SparkMaxConfig config, SparkBase.ResetMode resetMode, PersistMode persistmode) {

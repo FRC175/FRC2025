@@ -214,4 +214,9 @@ public class SwerveModule {
     
         return (0.4728678/encoder.getVelocity().getValueAsDouble());
     }
+
+    public void configureSparks(SparkMaxConfig config, ResetMode reset, PersistMode persist) {
+        drive.configure(config, reset, persist);
+        turn.configure(config, reset, persist);
+    }
 }

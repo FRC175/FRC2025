@@ -63,7 +63,7 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
        SmartDashboard.putNumber("ele dist", encoder.getDistance());
       
-       //System.out.println("Goal: " + getGoalSetpoint());
+       
     }
 
     // public boolean isTopProxMade () {

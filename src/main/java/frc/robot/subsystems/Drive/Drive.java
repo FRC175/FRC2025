@@ -63,7 +63,7 @@ public final class Drive implements Subsystem {
     
     private Drive() {
 
-        
+        this.defaultConfig = new SparkMaxConfig();
         // leftMaster = new CANSparkMax(DriveConstants.LEFT_MASTER_PORT, CANSparkMaxLowLevel.MotorType.kBrushless);
         frontRight = new SwerveModule(DriveConstants.frontRightDrive, DriveConstants.frontRightRot, DriveConstants.frontRightEncoder, DriveConstants.frontRightTurnAngle, DriveConstants.frontRightBaseAngle, true);
         frontLeft = new SwerveModule(DriveConstants.frontLeftDrive, DriveConstants.frontLeftRot, DriveConstants.frontLeftEncoder, DriveConstants.frontLeftTurnAngle, DriveConstants.frontLeftBaseAngle, false);
@@ -100,7 +100,7 @@ public final class Drive implements Subsystem {
             }, pose);
 
         lastValidAngle = 0;
-
+    
     
     defaultConfig.inverted(false);
     defaultConfig.openLoopRampRate(.05);

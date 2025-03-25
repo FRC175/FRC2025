@@ -62,8 +62,9 @@ public class Manipulator extends SubsystemBase {
         
         
 
-        defaultConfig
-        .inverted(false);
+        defaultConfig.inverted(false);
+        defaultConfig.openLoopRampRate(.25);
+        
         configureSparks(defaultConfig, resetMode, persistMode);
        
         goalPoint = manipulatorSetpoint.CORALTRAVEL.getSetpoint();

@@ -28,15 +28,25 @@ public class SetElevatorPosition extends SequentialCommandGroup {
                 if (setpoint == ElevatorSetpoint.L3) {
                     setp = ElevatorSetpoint.TOP_ALGAE;
                 }
+            } else {
+                if (setpoint == ElevatorSetpoint.L1) {
+                    setp = ElevatorSetpoint.L1;
+                }
+                if (setpoint == ElevatorSetpoint.L2) {
+                    setp = ElevatorSetpoint.L2;
+                }
+                if (setpoint == ElevatorSetpoint.L3) {
+                    setp = ElevatorSetpoint.L3;
+                }
             }}),
             new WaitUntilCommand(manipulator.isAtGoal(.011)),
-            new InstantCommand(() -> { elevator.setGoalPoint(setpoint);}),
+            new InstantCommand(() -> { elevator.setGoalPoint(setp);}),
             new WaitUntilCommand(elevator.isAtGoal(100)),
             new InstantCommand(() -> {
-                if (setpoint == ElevatorSetpoint.L1) {
+                if (setp == ElevatorSetpoint.L1) {
                     manipulator.setGoalPoint(manipulatorSetpoint.CORALIN.getSetpoint());
                 }
-                if (setpoint == ElevatorSetpoint.PROCESSOR) {
+                if (setp == ElevatorSetpoint.PROCESSOR) {
                     manipulator.setGoalPoint(manipulatorSetpoint.PROCESSOR.getSetpoint());
                 }
             })

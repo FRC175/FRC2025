@@ -103,8 +103,8 @@ public final class Drive implements Subsystem {
     
     
     defaultConfig.inverted(false);
-    defaultConfig.openLoopRampRate(.05);
-    defaultConfig.idleMode(IdleMode.kBrake);
+    //defaultConfig.openLoopRampRate(.05);
+    defaultConfig.idleMode(IdleMode.kCoast);
 
         
   
@@ -176,9 +176,9 @@ public final class Drive implements Subsystem {
         // System.out.println(gyroAngle.getDegrees());
 
         // Update the pose
-        SmartDashboard.putNumberArray("vectors", SwerveModule.vectorMagnitudes);
-        SmartDashboard.putNumber("x", x);
-        SmartDashboard.putNumber("y", y);
+        SmartDashboard.putBooleanArray("modules", new Boolean[]  {
+            frontLeft.isReversed(), frontRight.isReversed(), backLeft.isReversed(), backRight.isReversed()
+        });
 
     
         

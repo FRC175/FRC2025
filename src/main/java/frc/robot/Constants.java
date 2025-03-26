@@ -63,7 +63,7 @@ public final class Constants {
         public static final int backLeftEncoder = 14;
 
         public static final double frontRightBaseAngle = 0.066650;
-        public static final double frontLeftBaseAngle = 0.886963; //0.470215
+        public static final double frontLeftBaseAngle = 0.886963; 
         public static final double backRightBaseAngle = 0.371338;
         public static final double backLeftBaseAngle = 0.094238;
 

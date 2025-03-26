@@ -182,7 +182,7 @@ public class SwerveModule {
 
     public double getDriveDistance() {
         // return ((!reverseDistance && reversed) || (!reversed && reverseDistance)) ? (getDriveEncoder() / 6.75) * 0.319 : -1 * (getDriveEncoder() / 6.75) * 0.319;
-        return getDriveEncoder() / 6.75 * 0.319;
+        return getDriveEncoder() / 6.75 * 12.566;
     }
 
     public double getAngle() {

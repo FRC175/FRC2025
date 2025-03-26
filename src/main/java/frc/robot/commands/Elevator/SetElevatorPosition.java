@@ -9,9 +9,10 @@ import frc.robot.Constants.ElevatorSetpoint;
 import frc.robot.subsystems.Elevator;
 
 public class SetElevatorPosition extends SequentialCommandGroup {
-    private ElevatorSetpoint setp;
+    private ElevatorSetpoint setp, prevSetp;
     public SetElevatorPosition(Manipulator manipulator, Elevator elevator, ElevatorSetpoint setpoint) {
         this.setp = setpoint;
+        
         addCommands(
             new InstantCommand(() -> {
                 if (manipulator.getEncoder() < manipulatorSetpoint.CORALTRAVEL.getSetpoint()) {
@@ -49,6 +50,10 @@ public class SetElevatorPosition extends SequentialCommandGroup {
                 if (setp == ElevatorSetpoint.PROCESSOR) {
                     manipulator.setGoalPoint(manipulatorSetpoint.PROCESSOR.getSetpoint());
                 }
+                if (setp == ElevatorSetpoint.BTM_ALGAE || setp == ElevatorSetpoint.TOP_ALGAE) {
+                    manipulator.setGoalPoint(manipulatorSetpoint.ALGAEIN.getSetpoint());
+                }
+                
             })
             // new InstantCommand(() -> {
             //     if (setpoint == ElevatorSetpoint.L4) {

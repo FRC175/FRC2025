@@ -322,7 +322,7 @@ public final class Drive implements Subsystem {
     }
 
     public double getDriveDistance() {
-        return frontLeft.getDriveDistance();
+        return frontRight.getDriveDistance();
     }
 
     public void resetDriveDistance() {

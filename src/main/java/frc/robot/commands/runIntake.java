@@ -11,7 +11,7 @@ public class runIntake extends Command{
     private final Manipulator manipulator;
     private final Elevator elevator;
     private final Intake intake;
-    private boolean adjusting, upStream, downStream, algae;
+    private boolean upStream, downStream, firstIn ;
     private double demand;
     
    
@@ -20,10 +20,10 @@ public class runIntake extends Command{
     
 
     
-    public runIntake(double intDemand) {
+    public runIntake(double demand) {
       this.manipulator = Manipulator.getInstance();
       this.elevator = Elevator.getInstance();
-      this.demand = intDemand;
+      this.demand = demand;
       this.intake = Intake.getInstance();
       
       addRequirements(intake);
@@ -31,7 +31,7 @@ public class runIntake extends Command{
 
     @Override
     public void initialize() {
-      adjusting = false;
+      firstIn = true;
       upStream = false;
       downStream = false;
       intake.setState(intakePoints.OFF);
@@ -39,44 +39,47 @@ public class runIntake extends Command{
 
     @Override
     public void execute() {
-      System.out.println(demand);
       boolean upstream = intake.isUpstream();
       boolean downStream = intake.isDownstream();
       intakePoints state = intake.getState();
-
       if (state == intakePoints.INTAKE_CORAL) {
         
-        intake.setIntakeOpenLoop(-.1);
+        intake.setIntakeOpenLoop(-.5);
         if (downStream) {
           intake.setState(intakePoints.CAPTURED);
         }
       }
       if (state == intakePoints.CAPTURED) {
         if (downStream) {
-          intake.setIntakeOpenLoop(.1);
+          intake.setIntakeOpenLoop(.3);
         } else {
           intake.setIntakeOpenLoop (0);
         }
         
       }
       if (state == intakePoints.DISCHARGE_CORAL) {
-        if (manipulator.getEncoder() > .5) {
-          intake.setIntakeOpenLoop(-1);
-        } else {
-          intake.setIntakeOpenLoop(-.5); 
-          
-        }
+        
+          intake.setIntakeOpenLoop(-.7); 
         }
         
       
       if (state == intakePoints.OFF) {
+        if (state == intakePoints.INTAKE_ALGAE) {
+          firstIn = !firstIn;
+        }
         intake.setIntakeOpenLoop(0);
       }
+
       if (state == intakePoints.INTAKE_ALGAE) {
-        intake.setIntakeOpenLoop(1);
+        if (firstIn) {
+          intake.setIntakeOpenLoop(.7);
+        } else {
+          intake.setIntakeOpenLoop(.25);
+        }
+
       }
       if (state == intakePoints.DISCHARGEALGAE) {
-        intake.setIntakeOpenLoop(-1);
+        intake.setIntakeOpenLoop(-.7);
       }
       
       // if (manipulator.getEncoder() > .5) algae = true; else algae = false;

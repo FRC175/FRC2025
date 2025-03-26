@@ -98,7 +98,7 @@ public final class Constants {
         CORALIN(.275),
         CORALTRAVEL(.33),
         L4CORAL(.48),
-        ALGAEIN(.7),
+        ALGAEIN(.68),
         BARGE(.55),
         PROCESSOR(.7843);
         //ALGAE IN
@@ -121,8 +121,9 @@ public final class Constants {
         INTAKE_CORAL,
         DISCHARGE_CORAL,
         OFF,
-        DISCHARGEALGAE,
-        INTAKE_ALGAE;
+        DISCHARGE_ALGAE,
+        INTAKE_ALGAE,
+        HOLD_ALGAE;
 
     }
 

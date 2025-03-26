@@ -239,7 +239,7 @@ public class RobotContainer {
       .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
       new Trigger(() -> operatorController.getAButton())
-      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.DISCHARGEALGAE)))
+      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_ALGAE)))
       .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
 
     //  new Trigger(() -> operatorController.getRawButtonPressed(5))
@@ -286,6 +286,15 @@ public class RobotContainer {
         .onFalse (new InstantCommand(() -> { 
           intake.setState(intakePoints.OFF);})
         );
+
+        new Trigger(() -> operatorController.getRightTriggerAxis() > .1) 
+          .onTrue(new InstantCommand(() -> {
+            intake.setState(intakePoints.HOLD_ALGAE);}))
+
+          .onFalse(new InstantCommand(() -> {
+            intake.setState(intakePoints.OFF);
+          }));
+        
 
         new Trigger(() -> operatorController.getLeftTriggerAxis() > .1)
         .onTrue(new InstantCommand(() -> { 

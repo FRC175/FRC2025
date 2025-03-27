@@ -51,7 +51,7 @@ public class runIntake extends Command{
       }
       if (state == intakePoints.CAPTURED) {
         if (downStream) {
-          intake.setIntakeOpenLoop(.3);
+          intake.setIntakeOpenLoop(.1);
         } else {
           intake.setIntakeOpenLoop (0);
         }
@@ -76,7 +76,7 @@ public class runIntake extends Command{
       }
 
       if (state == intakePoints.HOLD_ALGAE) {
-        intake.setIntakeOpenLoop(.25);
+        intake.setIntakeOpenLoop(.085);
 
     }
 

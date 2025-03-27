@@ -288,7 +288,7 @@ public class RobotContainer {
         );
 
         new Trigger(() -> operatorController.getRightTriggerAxis() > .1) 
-          .onTrue(new InstantCommand(() -> {
+          .whileTrue(new InstantCommand(() -> {
             intake.setState(intakePoints.HOLD_ALGAE);}))
 
           .onFalse(new InstantCommand(() -> {

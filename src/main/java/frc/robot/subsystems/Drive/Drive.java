@@ -104,7 +104,7 @@ public final class Drive implements Subsystem {
     
     defaultConfig.inverted(false);
     //defaultConfig.openLoopRampRate(.05);
-    defaultConfig.idleMode(IdleMode.kCoast);
+    defaultConfig.idleMode(IdleMode.kBrake);
 
         
   
@@ -322,7 +322,7 @@ public final class Drive implements Subsystem {
     }
 
     public double getDriveDistance() {
-        return frontRight.getDriveDistance();
+        return frontLeft.getDriveDistance();
     }
 
     public void resetDriveDistance() {

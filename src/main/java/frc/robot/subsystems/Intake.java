@@ -77,6 +77,7 @@ public class Intake extends SubsystemBase {
         //SmartDashboard.putNumber("motor demand",)
         SmartDashboard.putBoolean("upstream", upstream.get());
         SmartDashboard.putBoolean("downstream", downstream.get());
+        SmartDashboard.putString("instate", getstrState());
         //System.out.println("upstream: " + upstream.get());
         // System.out.println("downstream: " + upstream.get());
     }
@@ -90,6 +91,10 @@ public class Intake extends SubsystemBase {
 
     public intakePoints getState () {
         return state;
+    }
+
+    public String getstrState () {
+        return state.toString();
     }
 
     public void setState(intakePoints state) {

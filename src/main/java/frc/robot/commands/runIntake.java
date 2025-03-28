@@ -13,13 +13,7 @@ public class runIntake extends Command{
     private final Intake intake;
     private boolean upStream, downStream, firstIn ;
     private double demand;
-    
-   
-    
-   
-    
 
-    
     public runIntake(double demand) {
       this.manipulator = Manipulator.getInstance();
       this.elevator = Elevator.getInstance();
@@ -44,7 +38,7 @@ public class runIntake extends Command{
       intakePoints state = intake.getState();
       if (state == intakePoints.INTAKE_CORAL) {
         
-        intake.setIntakeOpenLoop(-.2);
+        intake.setIntakeOpenLoop(-.1);  // was -.2
         if (downStream) {
           intake.setState(intakePoints.CAPTURED);
         }

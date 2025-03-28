@@ -19,15 +19,16 @@ public class B2L4 extends SequentialCommandGroup {
 
     public B2L4(Drive drive, Intake intake, Manipulator manipulator, Elevator elevator) {
         addCommands(
-        new InstantCommand(() -> drive.resetGyro(180)),
-        new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)),
-        new WaitUntilCommand(intake.isCaptured()),
-        new SwerveToDist(drive, .3, 180, 180, 3 ),
-        new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4),
-        new SwerveToDist(drive, .3, 180, 180, .1),
-        new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_CORAL)),
-        new WaitCommand(4),
-        new InstantCommand(() -> intake.setState(intakePoints.OFF))
+            new InstantCommand(() -> System.out.println("IN B2L4")),
+            new InstantCommand(() -> drive.resetGyro(180)),
+            new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)),
+            new WaitUntilCommand(intake.isCaptured()),
+            new SwerveToDist(drive, .3, 180, 180, 1.8 ),
+            new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4),
+            new SwerveToDist(drive, .05, 180, 180, .20),
+            new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_CORAL)),
+            new WaitCommand(2),
+            new InstantCommand(() -> intake.setState(intakePoints.OFF))
         );
         
 

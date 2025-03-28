@@ -63,7 +63,7 @@ public class Manipulator extends SubsystemBase {
         
 
         defaultConfig.inverted(false);
-        defaultConfig.openLoopRampRate(.25);
+        defaultConfig.openLoopRampRate(.35);
         
         configureSparks(defaultConfig, resetMode, persistMode);
        

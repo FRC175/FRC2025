@@ -144,8 +144,11 @@ public final class Drive implements Subsystem {
         backRight.configureSparks(defaultConfig, resetMode, persistMode);
     }
 
-    public Rotation2d getGyro() {
+    public Rotation2d getGyroRot2d() {
         return new Rotation2d(Math.toRadians(getOdometryAngle()));
+    }
+    public Pigeon2 getGyro() {
+        return pigeon;
     }
 
     /**
@@ -254,7 +257,7 @@ public final class Drive implements Subsystem {
 
     public void swerve(ChassisSpeeds speeds) {
         SwerveModule[] modules = new SwerveModule[]{frontRight, frontLeft, backRight, backLeft}; 
-        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getGyro());
+        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getGyroRot2d());
         SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
         for (int i = 0; i < 4; i++) {
             x = Math.cos(moduleStates[i].angle.getRadians());
@@ -387,7 +390,7 @@ public final class Drive implements Subsystem {
             new SwerveModuleState(backLeft.getVelocity(), new Rotation2d(Math.toRadians(backLeft.getOdometryAngle())))
           };
 
-          return ChassisSpeeds.fromFieldRelativeSpeeds(kinematics.toChassisSpeeds(moduleStates), getGyro());
+          return ChassisSpeeds.fromFieldRelativeSpeeds(kinematics.toChassisSpeeds(moduleStates), getGyroRot2d());
     }
     
     

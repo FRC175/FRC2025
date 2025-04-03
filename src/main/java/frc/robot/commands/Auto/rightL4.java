@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.ElevatorSetpoint;
 import frc.robot.Constants.intakePoints;
+import frc.robot.commands.Drive.RotateInPlace;
 import frc.robot.commands.Drive.SwerveToDist;
 import frc.robot.commands.Elevator.SetElevatorPosition;
 import frc.robot.subsystems.Elevator;
@@ -20,13 +21,13 @@ public class rightL4 extends SequentialCommandGroup {
     public rightL4(Drive drive, Intake intake, Manipulator manipulator, Elevator elevator) {
         addCommands(
             new InstantCommand(() -> System.out.println("Started rightL4")),
-            new InstantCommand(() -> drive.resetGyro(180)),
-            new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)),
-            new WaitUntilCommand(intake.isCaptured()),
-            new SwerveToDist(drive, .3, 180, 180, 2 ),
-            new SwerveToDist(drive, .3, 130, 180, 0),
-            new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4),
-            new SwerveToDist(drive,  .1, 180, 180, .28),
+             new InstantCommand(() -> drive.resetGyro(180)),
+             new RotateInPlace(drive, 240, drive.getGyro()),
+             new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)),
+             new WaitUntilCommand(intake.isCaptured()),
+            new SwerveToDist(drive, .3, 180, 240, 2.2 ),
+             new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4),
+            new SwerveToDist(drive,  .1, 240, 240, .4),
             new WaitCommand(2),
             new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_CORAL)),
             new WaitCommand(2),

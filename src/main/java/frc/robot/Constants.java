@@ -80,7 +80,7 @@ public final class Constants {
         BTM_ALGAE(2764),
         L3(4920),
         TOP_ALGAE(5908),
-        L4(9650);
+        L4(9500);
 
         double value;
         ElevatorSetpoint(double value) {

@@ -35,6 +35,8 @@ public class PhotonVision extends SubsystemBase {
     private static PhotonVision instance;
     private final PhotonCamera camera;
     private PhotonTrackedTarget target;
+    private double x, y;
+    
 
     private Supplier<Pose2d> currentPose;
   /**
@@ -111,6 +113,15 @@ public class PhotonVision extends SubsystemBase {
     }
   }
 
+  public double getX() {
+    return x;
+  }
+
+  public double getY() {
+    return y;
+  }
+
+
 
      
     @Override
@@ -130,6 +141,8 @@ public class PhotonVision extends SubsystemBase {
                     if (target.getFiducialId() == 586) {
                         // Found Tag 7, record its information
                         targetYaw = target.getYaw();
+                        System.out.println("x: " + (x = target.getBestCameraToTarget().getX()));
+                        System.out.println("y: " + (x = target.getBestCameraToTarget().getY()));
                         targetVisible = true;
                     }
                 }

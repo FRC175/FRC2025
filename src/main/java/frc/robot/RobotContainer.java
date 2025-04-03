@@ -37,8 +37,10 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.Drive.Drive;
 import frc.robot.commands.runIntake;
 import frc.robot.commands.setManipWorking;
-import frc.robot.commands.Auto.B2L4;
+import frc.robot.commands.Auto.cenL4;
 import frc.robot.commands.Auto.leave;
+import frc.robot.commands.Auto.leftL4;
+import frc.robot.commands.Auto.rightL4;
 import frc.robot.commands.Drive.Swerve;
 import frc.robot.commands.Elevator.ControlElevator;
 import frc.robot.commands.Elevator.SetElevatorPosition;
@@ -312,13 +314,16 @@ public class RobotContainer {
   }
 
   private void configureAutoChooser() {
-    autoChooser.setDefaultOption("Nothing", new ParallelCommandGroup(new WaitCommand(0), new InstantCommand(() -> drive.resetGyro(0))));
+    autoChooser.setDefaultOption("CenterL4", new cenL4(drive, intake, manipulator, elevator));
+    autoChooser.addOption("Nothing", new ParallelCommandGroup(new WaitCommand(0), new InstantCommand(() -> drive.resetGyro(0))));
     autoChooser.addOption("leave", new leave(drive));
-    autoChooser.addOption("CenterL4", new B2L4(drive, intake, manipulator, elevator));
+    autoChooser.addOption("LeftL4", new leftL4(drive, intake, manipulator, elevator));
+    autoChooser.addOption("RightL4", new rightL4(drive, intake, manipulator, elevator));
+    
    
     SmartDashboard.putData(autoChooser);
   }
-
+//nr[p,///.]
   
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -329,8 +334,8 @@ public class RobotContainer {
 
     // An ExampleCommand will run in autonomous
     
-    // return autoChooser.getSelected();
-    return new B2L4(drive, intake, manipulator, elevator);
+    return autoChooser.getSelected();
+    //return new B2L4(drive, intake, manipulator, elevator);
   }
 }
 

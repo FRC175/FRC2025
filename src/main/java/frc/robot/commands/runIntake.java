@@ -28,7 +28,7 @@ public class runIntake extends Command{
       firstIn = true;
       upStream = false;
       downStream = false;
-      intake.setState(intakePoints.OFF);
+      //intake.setState(intakePoints.OFF);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class runIntake extends Command{
       }
       if (state == intakePoints.DISCHARGE_CORAL) {
         
-          intake.setIntakeOpenLoop(-.7); 
+          intake.setIntakeOpenLoop(-.2); 
         }
         
       
@@ -65,7 +65,7 @@ public class runIntake extends Command{
       }
 
       if (state == intakePoints.INTAKE_ALGAE) {
-          intake.setIntakeOpenLoop(.7);
+          intake.setIntakeOpenLoop(.2);
 
       }
 

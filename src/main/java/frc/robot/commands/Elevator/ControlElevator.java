@@ -41,7 +41,7 @@ public class ControlElevator extends Command {
     }
 
     private double calculateProportionalOutput(double dist, double goalPoint) {
-      double slope = (downSpeed + upSpeed) / (2 * deadband);
+      double slope = (downSpeed + upSpeed) / (8 * deadband);
       double output = (dist - goalPoint) * slope;
       return output;
     }

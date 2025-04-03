@@ -2,6 +2,7 @@ package frc.robot.subsystems.Drive;
 
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.Drive.SwerveModule;
 import frc.robot.utils.Vector;
 
@@ -53,6 +54,7 @@ public final class Drive implements Subsystem {
     SparkMaxConfig defaultConfig;
     ResetMode resetMode;
     PersistMode persistMode;
+    PhotonVision photonVision;
    
     
     /**
@@ -363,6 +365,11 @@ public final class Drive implements Subsystem {
 
     public Pose2d getPose() {
         return pose;
+    }
+
+    public PhotonVision setupPhotonVisionObject() {
+        this.photonVision = new PhotonVision(getPoseSup(), field);
+        return photonVision;
     }
 
     public Supplier<Pose2d> getPoseSup() {

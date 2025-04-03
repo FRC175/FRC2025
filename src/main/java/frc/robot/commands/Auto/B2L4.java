@@ -18,7 +18,7 @@ import frc.robot.utils.Utils;
 public class B2L4 extends SequentialCommandGroup {
 
     public B2L4(Drive drive, Intake intake, Manipulator manipulator, Elevator elevator) {
-        addCommands(2qaz
+        addCommands(
         new InstantCommand(() -> drive.resetGyro(180)),
         new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)),
         new WaitUntilCommand(intake.isCaptured()),

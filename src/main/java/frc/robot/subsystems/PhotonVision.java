@@ -35,8 +35,9 @@ public class PhotonVision extends SubsystemBase {
     private static PhotonVision instance;
     private final PhotonCamera camera;
     private PhotonTrackedTarget target;
+    private double x, y;
+    
 
-    public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     private Supplier<Pose2d> currentPose;
   /**
    * Field from {@link swervelib.SwerveDrive#field}
@@ -50,6 +51,7 @@ public class PhotonVision extends SubsystemBase {
         this.field2d = field2d;
         camera = new PhotonCamera("Microsoft_LifeCam_HD-3000");
         camera.setPipelineIndex(0);
+        
        
     }
 
@@ -66,18 +68,18 @@ public class PhotonVision extends SubsystemBase {
    *                    itself correctly.
    * @return The target pose of the AprilTag.
    */
-  public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset)
-  {
-    Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
-    if (aprilTagPose3d.isPresent())
-    {
-      return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
-    } else
-    {
-      throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
-    }
+//   public static Pose2d getAprilTagPose(int aprilTag, Transform2d robotOffset)
+//   {
+//     Optional<Pose3d> aprilTagPose3d = fieldLayout.getTagPose(aprilTag);
+//     if (aprilTagPose3d.isPresent())
+//     {
+//       return aprilTagPose3d.get().toPose2d().transformBy(robotOffset);
+//     } else
+//     {
+//       throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
+//     }
 
-  }
+ // }
 
   public PhotonTrackedTarget getTargetFromId(int id, PhotonCamera camera)
   {
@@ -111,11 +113,20 @@ public class PhotonVision extends SubsystemBase {
     }
   }
 
+  public double getX() {
+    return x;
+  }
+
+  public double getY() {
+    return y;
+  }
+
+
 
      
     @Override
     public void periodic() {
-
+        
         // Read in relevant data from the Camera
         boolean targetVisible = false;
         double targetYaw = 0.0;
@@ -130,6 +141,8 @@ public class PhotonVision extends SubsystemBase {
                     if (target.getFiducialId() == 586) {
                         // Found Tag 7, record its information
                         targetYaw = target.getYaw();
+                        System.out.println("x: " + (x = target.getBestCameraToTarget().getX()));
+                        System.out.println("y: " + (x = target.getBestCameraToTarget().getY()));
                         targetVisible = true;
                     }
                 }

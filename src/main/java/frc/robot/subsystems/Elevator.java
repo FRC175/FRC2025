@@ -1,25 +1,33 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.servohub.ServoHub;
+
+import java.util.function.BooleanSupplier;
+
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkClosedLoopController;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.ConfigurationFailedException;
-import frc.robot.Constants.elevatorSetpoint;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ElevatorSetpoint;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 public class Elevator extends SubsystemBase {
     private static Elevator instance;
     private final SparkMax master, slave;
+    private final Encoder encoder;
     private final SparkMaxConfig defaultConfig;
     private final ResetMode resetMode;
     private final PersistMode persistMode;
@@ -27,9 +35,8 @@ public class Elevator extends SubsystemBase {
     public boolean coralInPeril;
     public boolean coralOverride;
     public boolean manual;
-    private elevatorSetpoint goalPoint;
-    private final DigitalInput topProxSwitch, botProxSwitch;
-    
+   // private final DigitalInput topProxSwitch, botProxSwitch;
+    private double goalPoint = 0.0;
 
     public Elevator() {
         this.master = new SparkMax(15, MotorType.kBrushless);
@@ -38,33 +45,34 @@ public class Elevator extends SubsystemBase {
         this.resetMode = SparkBase.ResetMode.kResetSafeParameters;
         this.persistMode = PersistMode.kPersistParameters;
         this.distSensor = new LaserCan(21);
-        coralOverride = false;
-        this.botProxSwitch = new DigitalInput(3);
-        this.topProxSwitch = new DigitalInput(4);
-
-
-
-        defaultConfig
-        .inverted(false);
+        
+        //encoder = new DigitalInput(3);
+        // this.botProxSwitch = new DigitalInput(3);
+        // this.topProxSwitch = new DigitalInput(4);
+         encoder = new Encoder(4, 3);
+        defaultConfig.inverted(false);
+        defaultConfig.openLoopRampRate(.75);
         configureSparks();
-        configureDistSensor();
+        //
+        resetEncoder();
 
-       goalPoint =  elevatorSetpoint.GROUND;
+        goalPoint = ElevatorSetpoint.L1.getSetpoint();
     }
     
     @Override
     public void periodic() {
-       SmartDashboard.putNumber("ele dist", getDistance());
+       SmartDashboard.putNumber("ele dist", encoder.getDistance());
+      
+       
     }
 
-    public boolean isTopProxMade () {
-        return topProxSwitch.get();
-    }
+    // public boolean isTopProxMade () {
+    //     return topProxSwitch.get();
+    // }
 
-    public boolean isBotProxMade () {
-        return botProxSwitch.get();
-    }
-    
+    // public boolean isBotProxMade () {
+    //     return botProxSwitch.get();
+    // }
 
     public static Elevator getInstance() {
         if ( instance == null) {
@@ -78,22 +86,30 @@ public class Elevator extends SubsystemBase {
         master.configure(defaultConfig, resetMode, persistMode);
         // configure sparkMAX motor controllers
     }
-    
-    public void configureDistSensor () {
-        try {
-            distSensor.setRangingMode(LaserCan.RangingMode.LONG);
-            distSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
-            distSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
-          } catch (ConfigurationFailedException e) {
-            System.out.println("!LaserCAN config failed! " + e);
-          }
 
-          // attempts to configure LaserCAN, if the configuration fails, it prints an error message
+    public void resetEncoder() {
+        encoder.reset();
     }
     
-    public double getDistance() {
-        LaserCan.Measurement measurement = distSensor.getMeasurement();
-        return (measurement.distance_mm + -123.6) ;
+    // public void configureDistSensor () {
+    //     try {
+    //         distSensor.setRangingMode(LaserCan.RangingMode.LONG);
+    //         distSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
+    //         distSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+    //       } catch (ConfigurationFailedException e) {
+    //         System.out.println("!LaserCAN config failed! " + e);
+    //       }
+
+    //       // attempts to configure LaserCAN, if the configuration fails, it prints an error message
+    // }
+    
+    public int getDistance() {
+
+        return encoder.get();
+        // double measurement = distSensor.getMeasurement().distance_mm;
+        // measurement = Math.min(measurement, ElevatorConstants.MAX_HEIGHT);
+        // measurement = Math.max(measurement, ElevatorConstants.MIN_HEIGHT);
+        // return measurement;
     }
 
     public void setOpenLoop (double demand) {
@@ -101,17 +117,21 @@ public class Elevator extends SubsystemBase {
         slave.set(demand);
     }
 
-    public elevatorSetpoint getGoalSetpoint () {
+    public double getGoalSetpoint () {
         return goalPoint;
     }
 
-    public void setGoalPoint (elevatorSetpoint setpoint) {
+    public void setGoalPoint (ElevatorSetpoint setpoint) {
+        goalPoint = setpoint.getSetpoint();
+    }
+
+    public void setGoalPoint (double setpoint) {
+        if (setpoint > ElevatorConstants.MAX_HEIGHT || setpoint < ElevatorConstants.MIN_HEIGHT) return;
         goalPoint = setpoint;
     }
 
-
-
-   
-
-
+     public BooleanSupplier isAtGoal(double deadband) {
+        BooleanSupplier isAtGoal = () -> (!((getDistance() < goalPoint - deadband) || (getDistance() > goalPoint + deadband))); 
+       return isAtGoal;
+    }
 }

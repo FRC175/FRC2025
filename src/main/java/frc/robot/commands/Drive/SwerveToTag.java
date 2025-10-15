@@ -1,22 +1,24 @@
-// package frc.robot.commands;
+// package frc.robot.commands.Drive;
+
 
 // import java.lang.annotation.Target;
 
 // import edu.wpi.first.math.geometry.Pose2d;
 // import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 // import edu.wpi.first.wpilibj2.command.Command;
-// import frc.robot.subsystems.SwerveSubsystem;
+
+// import frc.robot.subsystems.Drive.Drive;
 // import frc.robot.subsystems.PhotonVision;
 
 
 // public class SwerveToTag extends Command{
-//    private SwerveSubsystem swerveSubsystem;
+//    private Drive drive;
 //    private PhotonVision photonVision;
 //    private Pose2d targetPos;
    
-//     public SwerveToTag(SwerveSubsystem swerveSubsystem) {
-//         this.swerveSubsystem = swerveSubsystem;
-//         photonVision = swerveSubsystem.setupPhotonVisionObject();
+//     public SwerveToTag(Drive drive) {
+//         this.drive = drive;
+//         photonVision = drive.setupPhotonVisionObject();
         
 
       
@@ -28,8 +30,9 @@
 //         int target = photonVision.getPrimaryTargetId();
 //         if (!(target == -1)) {
             
-//             targetPos = PhotonVision.getAprilTagPose(target, null);
-//             swerveSubsystem.driveToPose(targetPos);
+//             Double dist = photonVision.getX();
+//             Double heading = photonVision.getY();
+//             new SwerveToDist(drive, .28, heading, drive.getYaw(), dist);
 //         //need to tune!
 //         }
       

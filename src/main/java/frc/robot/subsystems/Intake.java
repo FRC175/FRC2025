@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import com.revrobotics.spark.SparkMax;
@@ -33,15 +32,15 @@ import frc.robot.Constants.intakePoints;
 
 
 
-public class Manipulator extends SubsystemBase {
+public class Intake extends SubsystemBase {
     
-    private static Manipulator instance;
-    private final SparkMax flip;
+    private static Intake instance;
+    private final SparkMax intake;
     private final SparkMaxConfig defaultConfig;
     private final ResetMode resetMode;
     private final PersistMode persistMode;
-    
-    private boolean manual;
+    private boolean isFlipped;
+    public boolean manual, cc;
     private AbsoluteEncoderConfig flipConfig;
     private SparkAbsoluteEncoder flipEncoder;
     private DigitalInput upstream, downstream;
@@ -50,23 +49,23 @@ public class Manipulator extends SubsystemBase {
     private intakePoints state;
     // default position (false) is coral
 
-    public Manipulator() {
-        this.flip = new SparkMax(17, MotorType.kBrushless);
+    public Intake() {
+        
+        this.intake = new SparkMax(18, MotorType.kBrushless);
         this.defaultConfig = new SparkMaxConfig();
-        this.flipEncoder = flip.getAbsoluteEncoder();
-        this.flipConfig = new AbsoluteEncoderConfig();
+        this.downstream = new DigitalInput(1);
+        this.upstream = new DigitalInput(2);
         resetMode = SparkBase.ResetMode.kResetSafeParameters;
         persistMode = PersistMode.kPersistParameters;
         manual = false;
+        cc = false;
         state = intakePoints.OFF;
         
-        
+        isFlipped = false;
 
-        defaultConfig.inverted(false);
-        defaultConfig.openLoopRampRate(.35);
-        
+        defaultConfig
+        .inverted(false);
         configureSparks(defaultConfig, resetMode, persistMode);
-       
         goalPoint = manipulatorSetpoint.CORALTRAVEL.getSetpoint();
         // goalPosition = manipulatorSetpoint.CORALIN;
         // currentSetpoint = manipulatorSetpoint.CORALIN;
@@ -74,15 +73,18 @@ public class Manipulator extends SubsystemBase {
     
     @Override
     public void periodic() {
-       SmartDashboard.putNumber("flipAngle", getEncoder());
-       SmartDashboard.putNumber("GoalAngle", getGoalSetpoint());
-       //System.out.println(!((getEncoder() < getGoalSetpoint() - .05) || (getEncoder() > getGoalSetpoint() + .05)));
-       //System.out.println(isAtGoal(.05).getAsBoolean());
-       }
+       //SmartDashboard.putNumber("flipAngle", getEncoder());
+        //SmartDashboard.putNumber("motor demand",)
+        SmartDashboard.putBoolean("upstream", upstream.get());
+        SmartDashboard.putBoolean("downstream", downstream.get());
+        SmartDashboard.putString("instate", getstrState());
+        //System.out.println("upstream: " + upstream.get());
+        // System.out.println("downstream: " + upstream.get());
+    }
 
-    public static Manipulator getInstance() {
+    public static Intake getInstance() {
         if ( instance == null) {
-            instance = new Manipulator();
+            instance = new Intake();
         }
         return instance;
     }
@@ -91,60 +93,43 @@ public class Manipulator extends SubsystemBase {
         return state;
     }
 
+    public String getstrState () {
+        return state.toString();
+    }
+
     public void setState(intakePoints state) {
         this.state = state;
     }
 
-    public boolean isInDangerZone() {
-        return (getEncoder() < manipulatorSetpoint.CORALTRAVEL.getSetpoint());
-    }
-  
-    public void invertFlip () {
-       SparkMaxConfig invertConfig = new SparkMaxConfig();
-        invertConfig
-        .inverted(false);
-        flip.configure(invertConfig, resetMode, persistMode);
-     }
-
-    
-
-    public void setFlipOpenLoop (double demand) {
-        flip.set(demand);
+   
+   
+    public void setIntakeOpenLoop (double demand) {
+        intake.set(demand);
     }
 
-    public double getEncoder() {
-        return flipEncoder.getPosition();
+    public boolean isUpstream() {
+        return !upstream.get();
+    }
+
+    public double getIntakeSpeed() {
+        RelativeEncoder encoder = intake.getEncoder();
+        return encoder.getVelocity();
+
+    }
+
+    public boolean isDownstream() {
+        return !downstream.get();
     }
 
    
-
-    public double getGoalSetpoint() {
-        return goalPoint;
+    public BooleanSupplier isCaptured () {
+        BooleanSupplier captured = () -> (getState() == intakePoints.CAPTURED);
+        return captured;
     }
-
-    public void setGoalPoint(double setpoint) {
-        goalPoint = setpoint;
-    }
-
-    public manipulatorSetpoint getCurrentSetpoint() {
-        return currentSetpoint;
-    }
-
-    public void setCurrentSetpoint(manipulatorSetpoint  setpoint) {
-        currentSetpoint = setpoint;
-    }
-
-
 
 
     private void configureSparks (SparkMaxConfig config, SparkBase.ResetMode resetMode, PersistMode persistmode) {
-        flip.configure(config, resetMode, persistMode);
-       
-    }
-
-    public BooleanSupplier isAtGoal(double deadband) {
-        BooleanSupplier isAtGoal = () -> (!((getEncoder() < getGoalSetpoint() - deadband) || (getEncoder() > getGoalSetpoint() + deadband)));
-       return isAtGoal;
+        intake.configure(config, resetMode, persistmode);
     }
 
     

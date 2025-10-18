@@ -34,14 +34,7 @@ import frc.robot.Constants.intakePoints;
 import frc.robot.Constants.manipulatorSetpoint;
 
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Drive.Drive;
-import frc.robot.commands.runIntake;
-import frc.robot.commands.setManipWorking;
-import frc.robot.commands.Auto.cenL4;
-import frc.robot.commands.Auto.leave;
-import frc.robot.commands.Auto.leftL4;
-import frc.robot.commands.Auto.rightL4;
-import frc.robot.commands.Drive.Swerve;
+
 import frc.robot.commands.Elevator.ControlElevator;
 import frc.robot.commands.Elevator.SetElevatorPosition;
 
@@ -70,7 +63,7 @@ public class RobotContainer {
 //private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
   private static RobotContainer instance;
-  private final Drive drive;
+
   private final Field2d field;
 
   private PathPlannerLogging pLogging;
@@ -82,7 +75,7 @@ public class RobotContainer {
     this.cage = Cage.getInstance();
     this.elevator = Elevator.getInstance();
     this.manipulator = Manipulator.getInstance();
-    this.drive = Drive.getInstance();
+  
     this.intake = Intake.getInstance();
     this.field = new Field2d();
 
@@ -145,7 +138,7 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
 
-    drive.setDefaultCommand(new Swerve(driverController, drive));
+    
 
     // cage.setDefaultCommand(new RunCommand(() -> {
     //   cage.enableCompressor();
@@ -155,9 +148,7 @@ public class RobotContainer {
     // () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
     // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
    
-   
-    manipulator.setDefaultCommand ( new setManipWorking(manipulator, .1, 0.5, 0.5));
-    intake.setDefaultCommand( new runIntake(.5));
+  
     elevator.setDefaultCommand(new ControlElevator(0.85, 0.45, 915));
 
 
@@ -170,12 +161,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new Trigger (() -> driverController.getLeftBumperButton())
-    .onTrue(new InstantCommand(() -> drive.resetGyro(0), drive));
-
-    new Trigger (() -> driverController.getRightBumperButton())
-    .onTrue(new ParallelCommandGroup(new InstantCommand(() -> drive.setPrevYaw(drive.getRawYaw())), new InstantCommand(() -> drive.resetGyro(0))))
-    .onFalse(new InstantCommand(() -> drive.resetGyro(drive.getPrevYaw())));
 
     // new Trigger(() -> operatorController.getRawButton(9))
     // .onTrue( new InstantCommand(() -> {
@@ -314,12 +299,7 @@ public class RobotContainer {
   }
 
   private void configureAutoChooser() {
-    autoChooser.setDefaultOption("CenterL4", new cenL4(drive, intake, manipulator, elevator));
-    autoChooser.addOption("Nothing", new ParallelCommandGroup(new WaitCommand(0), new InstantCommand(() -> drive.resetGyro(0))));
-    autoChooser.addOption("leave", new leave(drive));
-    autoChooser.addOption("LeftL4", new leftL4(drive, intake, manipulator, elevator));
-    autoChooser.addOption("RightL4", new rightL4(drive, intake, manipulator, elevator));
-    
+
    
     SmartDashboard.putData(autoChooser);
   }

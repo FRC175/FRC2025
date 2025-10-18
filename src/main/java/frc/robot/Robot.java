@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Drive.Drive;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -22,7 +22,7 @@ import frc.robot.subsystems.Drive.Drive;
 public class Robot extends TimedRobot {
  
   private Elevator elevator;
-  private Drive drive;
+  
 
   //private SwerveSubsystem swerveSubsystem;
   
@@ -133,7 +133,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
-    this.drive = Drive.getInstance();
+    
   }
 
   /** This function is called periodically whilst in simulation. */

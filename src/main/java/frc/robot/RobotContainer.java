@@ -5,6 +5,7 @@
 package frc.robot;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,18 +16,22 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ElevatorSetpoint;
@@ -34,7 +39,7 @@ import frc.robot.Constants.intakePoints;
 import frc.robot.Constants.manipulatorSetpoint;
 
 import frc.robot.subsystems.*;
-
+import swervelib.SwerveInputStream;
 import frc.robot.commands.Elevator.ControlElevator;
 import frc.robot.commands.Elevator.SetElevatorPosition;
 
@@ -52,7 +57,7 @@ public class RobotContainer {
   // private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   
-  private final XboxController driverController, operatorController/* , operatorController*/;
+ 
   //private final GenericHID operatorController;
   private final SendableChooser<Command> autoChooser;
  /// private final Shuckleboard shuffleboard;
@@ -60,6 +65,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Manipulator manipulator;
   private final Intake intake;
+  
 //private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   
   private static RobotContainer instance;
@@ -67,6 +73,69 @@ public class RobotContainer {
   private final Field2d field;
 
   private PathPlannerLogging pLogging;
+
+  
+   
+
+  final CommandXboxController driverController = new  CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
+    //operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+ 
+    final CommandXboxController operatorController = new  CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+    //operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+ 
+    
+  private final SwerveSubsytem drivebase = new SwerveSubsytem(new File(Filesystem.getDeployDirectory(),"swerve"));
+
+
+
+  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+  () -> driverController.getLeftY() * -1,
+  () -> driverController.getLeftX() * -1)
+.withControllerRotationAxis(driverController::getRightX)
+.deadband(ControllerConstants.DEADBAND)
+.scaleTranslation(0.8)
+.allianceRelativeControl(true);
+
+
+SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
+() -> -driverController.getLeftY(),
+() -> -driverController.getLeftX())
+.withControllerRotationAxis(() -> driverController.getRawAxis(
+2))
+.deadband(ControllerConstants.DEADBAND)
+.scaleTranslation(0.8)
+.allianceRelativeControl(true);
+
+
+/**
+* Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
+*/
+SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverController::getRightX,
+                               driverController::getRightY)
+.headingWhile(true);
+
+SwerveInputStream driveDirectAngleKeyboard     = driveAngularVelocityKeyboard.copy()
+                                                                               .withControllerHeadingAxis(() ->
+                                                                                                              Math.sin(
+                                                                                                                  driverController.getRawAxis(
+                                                                                                                      2) *
+                                                                                                                  Math.PI) *
+                                                                                                              (Math.PI *
+                                                                                                               2),
+                                                                                                          () ->
+                                                                                                              Math.cos(
+                                                                                                                  driverController.getRawAxis(
+                                                                                                                      2) *
+                                                                                                                  Math.PI) *
+                                                                                                              (Math.PI *
+                                                                                                               2))
+                                                                               .headingWhile(true)
+                                                                               .translationHeadingOffset(true)
+                                                                               .translationHeadingOffset(Rotation2d.fromDegrees(
+                                                                                   0));
+
+
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -81,15 +150,18 @@ public class RobotContainer {
 
     pLogging = new PathPlannerLogging();
 
-    driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
-    //operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
-    operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
-
+    
   
 
 
 
     autoChooser = new SendableChooser<>();
+
+     /**
+   * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
+   */
+ 
+
 
     
     // Configure the default commands
@@ -100,22 +172,34 @@ public class RobotContainer {
 
     // Configure auto mode
     configureAutoChooser();
-  
 
-   
-        
-
+    // Configure YAGSL swerve commands
+    configureSwerveBindings();
+      
+    
        
-  
+            
     
-   
-    
-
-        // Logging callback for the active path, this is sent as a list of poses
+           
+      
         
-  }
-
-  public static RobotContainer getInstance() {
+       
+        
+    
+            // Logging callback for the active path, this is sent as a list of poses
+            
+      }
+    
+      private void configureSwerveBindings() {
+        
+    Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
+    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedDirectAngleKeyboard      = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+    Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+ 
+      }
+    
+      public static RobotContainer getInstance() {
     if (instance == null) {
         instance = new RobotContainer();
     }
@@ -166,79 +250,6 @@ public class RobotContainer {
     // .onTrue( new InstantCommand(() -> {
     //   manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());}));
     
-    new Trigger(() -> operatorController.getLeftBumperButtonPressed())
-      .onTrue( new InstantCommand(() -> {
-        manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());}));
-    
-    // new Trigger(() -> operatorController.getRawButton(13))
-    // .onTrue( new InstantCommand(() -> {
-    //     manipulator.setGoalPoint(manipulatorSetpoint.CORALIN.getSetpoint());}));
-  
-
-    
-    //  new Trigger(() -> operatorController.getRawButtonPressed(14))
-    //   .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
-
-     new Trigger(() -> operatorController.getPOV() == 0)
-      .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
-    
-    // new Trigger(() -> operatorController.getRawButtonPressed(10))
-    //   .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
-    
-     new Trigger(() -> operatorController.getPOV() == 90)
-      .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
-    
-    
-    // new Trigger(() -> operatorController.getRawButtonPressed(6))
-    //   .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
-
-    new Trigger(() -> operatorController.getPOV() == 180)
-      .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
-    
-    
-    // new Trigger(() -> operatorController.getRawButtonPressed(2))
-    //   .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
-
-     new Trigger(() -> operatorController.getPOV() == 270)
-      .onTrue(new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
-    
-
-
-    // new Trigger(() -> operatorController.getRawButton(16))
-    //   .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)))
-    //   .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
-
-      new Trigger(() -> operatorController.getYButton())
-      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)))
-      .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
-
-
-    // new Trigger(() -> operatorController.getRawButton(15))
-    //   .onTrue(new InstantCommand(() ->  intake.setState(intakePoints.DISCHARGE_CORAL)))
-    //   .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
-
-      new Trigger(() -> operatorController.getBButton())
-      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_CORAL)))
-      .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
-
-      new Trigger(() -> operatorController.getXButton())
-      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.INTAKE_ALGAE)))
-      .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
-
-      new Trigger(() -> operatorController.getAButton())
-      .onTrue(new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_ALGAE)))
-      .onFalse(new InstantCommand(() -> intake.setState(intakePoints.OFF)));
-
-    //  new Trigger(() -> operatorController.getRawButtonPressed(5))
-    // .onTrue(new InstantCommand(() -> {
-    //   manipulator.setGoalPoint(manipulatorSetpoint.ALGAEIN.getSetpoint());}));
-
-      new Trigger(() -> operatorController.getRightBumperButtonPressed())
-      .onTrue(new InstantCommand(() -> {
-        manipulator.setGoalPoint(manipulatorSetpoint.ALGAEIN.getSetpoint());}));
-  
-
-   
    
       //change to new buttons
       // new Trigger(() -> operatorController.getRawButton(7))
@@ -265,14 +276,6 @@ public class RobotContainer {
       //   .onTrue(new InstantCommand(() -> { 
       //     manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
       //   }));
-
-        new Trigger(() -> operatorController.getXButton())
-        .onTrue(new InstantCommand(() -> { 
-          intake.setState(intakePoints.INTAKE_ALGAE);}))
-        
-        .onFalse (new InstantCommand(() -> { 
-          intake.setState(intakePoints.OFF);})
-        );
 
         new Trigger(() -> operatorController.getRightTriggerAxis() > .1) 
           .whileTrue(new InstantCommand(() -> {

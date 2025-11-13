@@ -2,19 +2,23 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.SwerveDrive;
+import swervelib.SwerveDriveTest;
 import swervelib.math.SwerveMath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,10 +33,8 @@ public class SwerveSubsytem extends SubsystemBase {
 
     public SwerveSubsytem (File directory) {
            // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
+           // TODO: set to lOW before competition/irl testing
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-    
-    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
-    swerveDrive.setCosineCompensator(false); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     double maximumSpeed = Units.feetToMeters(4.5);
     File swerveJsonDirectory = directory;
     try {
@@ -40,6 +42,10 @@ public class SwerveSubsytem extends SubsystemBase {
     } catch (IOException e) {
         throw new RuntimeException(e);
     }
+    
+    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
+    swerveDrive.setCosineCompensator(false); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
+    
     }
 
     @Override
@@ -59,6 +65,16 @@ public class SwerveSubsytem extends SubsystemBase {
   {
     swerveDrive.zeroGyro();
   }
+
+  public void lock() {
+    swerveDrive.lockPose();
+  }
+
+    public void addFakeVisionReading()
+  {
+    swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
+  }
+
 
   /**
    * Checks if the alliance is red, defaults to false if alliance isn't available.
@@ -81,6 +97,10 @@ public class SwerveSubsytem extends SubsystemBase {
   {
     return getPose().getRotation();
   }
+
+
+  
+
 
    /**
    * Drive the robot given a chassis field oriented velocity.
@@ -165,5 +185,38 @@ public class SwerveSubsytem extends SubsystemBase {
     return swerveDrive;
   }
 
+  public void resetOdometry(Pose2d initialHolonomicPose)
+  {
+    swerveDrive.resetOdometry(initialHolonomicPose);
+  }
+
+
+  public Command sysIdDriveMotorCommand()
+  {
+    return SwerveDriveTest.generateSysIdCommand(
+        SwerveDriveTest.setDriveSysIdRoutine(
+            new Config(),
+            this, swerveDrive, 12, true),
+        3.0, 5.0, 3.0);
+  }
+
+
+
+  public Command driveToDistanceCommand(double distanceInMeters, double speedInMetersPerSecond)
+  {
+    return run(() -> drive(new ChassisSpeeds(speedInMetersPerSecond, 0, 0)))
+            .until(() -> swerveDrive.getPose().getTranslation().getDistance(new Translation2d(0, 0)) >
+                         distanceInMeters);
+    }
+    
+    public void drive(ChassisSpeeds velocity)
+  {
+    swerveDrive.drive(velocity);
+  }
+  public Command centerModulesCommand()
+  {
+    return run(() -> Arrays.asList(swerveDrive.getModules())
+                           .forEach(it -> it.setAngle(0.0)));
+  }
 
 }

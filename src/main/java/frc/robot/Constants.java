@@ -72,6 +72,8 @@ public final class Constants {
 
         public static final double ENCODERTOANGLE = (double) 360/4096;
 
+        public static final double MAX_SPEED = TODDLER_MODE;
+
     }
     public enum ElevatorSetpoint {
         L1(0),

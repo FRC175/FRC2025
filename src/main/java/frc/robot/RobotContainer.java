@@ -16,10 +16,17 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -80,7 +87,7 @@ public class RobotContainer {
   final CommandXboxController driverController = new  CommandXboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
     //operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
  
-    final CommandXboxController operatorController = new  CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
+  final CommandXboxController operatorController = new  CommandXboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
     //operatorController = new GenericHID(ControllerConstants.OPERATOR_CONTROLLER_PORT);
  
     
@@ -89,50 +96,35 @@ public class RobotContainer {
 
 
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
-  () -> driverController.getLeftY() * -1,
-  () -> driverController.getLeftX() * -1)
-.withControllerRotationAxis(driverController::getRightX)
-.deadband(ControllerConstants.DEADBAND)
-.scaleTranslation(0.8)
-.allianceRelativeControl(true);
+  () -> driverController.getLeftY() * -1, () -> driverController.getLeftX() * -1)
+    .withControllerRotationAxis(driverController::getRightX)
+    .deadband(ControllerConstants.DEADBAND)
+    .scaleTranslation(0.8)
+    .allianceRelativeControl(true);
 
 
-SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
-() -> -driverController.getLeftY(),
-() -> -driverController.getLeftX())
-.withControllerRotationAxis(() -> driverController.getRawAxis(
-2))
-.deadband(ControllerConstants.DEADBAND)
-.scaleTranslation(0.8)
-.allianceRelativeControl(true);
+  SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
+  () -> -driverController.getLeftY(),
+  () -> -driverController.getLeftX())
+  .withControllerRotationAxis(() -> driverController.getRawAxis(
+  2))
+  .deadband(ControllerConstants.DEADBAND)
+  .scaleTranslation(0.8)
+  .allianceRelativeControl(true);
 
 
-/**
-* Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
-*/
-SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverController::getRightX,
-                               driverController::getRightY)
-.headingWhile(true);
+  /**
+  * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
+  */
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
+  .headingWhile(true);
 
-SwerveInputStream driveDirectAngleKeyboard     = driveAngularVelocityKeyboard.copy()
-                                                                               .withControllerHeadingAxis(() ->
-                                                                                                              Math.sin(
-                                                                                                                  driverController.getRawAxis(
-                                                                                                                      2) *
-                                                                                                                  Math.PI) *
-                                                                                                              (Math.PI *
-                                                                                                               2),
-                                                                                                          () ->
-                                                                                                              Math.cos(
-                                                                                                                  driverController.getRawAxis(
-                                                                                                                      2) *
-                                                                                                                  Math.PI) *
-                                                                                                              (Math.PI *
-                                                                                                               2))
-                                                                               .headingWhile(true)
-                                                                               .translationHeadingOffset(true)
-                                                                               .translationHeadingOffset(Rotation2d.fromDegrees(
-                                                                                   0));
+  SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy().withControllerHeadingAxis(() ->
+      Math.sin( driverController.getRawAxis(2) *Math.PI) *(Math.PI *2),() ->
+        Math.cos(driverController.getRawAxis( 2) * Math.PI) * (Math.PI * 2))
+          .headingWhile(true)
+          .translationHeadingOffset(true)
+          .translationHeadingOffset(Rotation2d.fromDegrees(0));
 
 
 
@@ -192,10 +184,55 @@ SwerveInputStream driveDirectAngleKeyboard     = driveAngularVelocityKeyboard.co
     
       private void configureSwerveBindings() {
         
-    Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
-    Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveFieldOrientedDirectAngleKeyboard      = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
-    Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+      Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
+      Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
+      Command driveFieldOrientedDirectAngleKeyboard      = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
+      Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+
+        if (RobotBase.isSimulation())
+    {
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    } else
+    {
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    }
+
+    if (Robot.isSimulation())
+    {
+      Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
+      //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+      driveDirectAngleKeyboard.driveToPose(() -> 
+        target, new ProfiledPIDController(5, 0, 0, new Constraints(5, 2)), new ProfiledPIDController(5, 0, 0, new Constraints(Units.degreesToRadians(360), Units.degreesToRadians(180))
+      ));
+      driverController.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+      driverController.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true), () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+
+//      driverController.b().whileTrue(
+//          drivebase.driveToPose(
+//              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+//                              );
+
+    }
+    if (DriverStation.isTest())
+    {
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+
+      driverController.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverController.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverController.back().whileTrue(drivebase.centerModulesCommand());
+      driverController.leftBumper().onTrue(Commands.none());
+      driverController.rightBumper().onTrue(Commands.none());
+    } else
+    {
+      driverController.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverController.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      driverController.start().whileTrue(Commands.none());
+      driverController.back().whileTrue(Commands.none());
+      driverController.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverController.rightBumper().onTrue(Commands.none());
+    }
  
       }
     
@@ -210,72 +247,24 @@ SwerveInputStream driveDirectAngleKeyboard     = driveAngularVelocityKeyboard.co
   
   
 
-  // public void registerCommandsAuto() {
-  //     //NamedCommands.registerCommand("SwerveToTag", new SwerveToTag(drive));
-  //     NamedCommands.registerCommand("Intake", new InstantCommand(() -> intake.setState(intakePoints.INTAKE_CORAL)));
-  //     NamedCommands.registerCommand("Discharge", new InstantCommand(() -> intake.setState(intakePoints.DISCHARGE_CORAL)));
-  //     NamedCommands.registerCommand("L1", new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L1));
-  //     NamedCommands.registerCommand("L2", new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L2));
-  //     NamedCommands.registerCommand("L3", new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L3));
-  //     NamedCommands.registerCommand("L4", new SetElevatorPosition(manipulator, elevator, ElevatorSetpoint.L4));
-  // }
 
   private void configureDefaultCommands() {
 
     
 
-    // cage.setDefaultCommand(new RunCommand(() -> {
-    //   cage.enableCompressor();
-    // } , cage));
-    // drive.setDefaultCommand(drive.driveRelativeCommand(() ->
-    //  MathUtil.applyDeadband(-1*driverController.getLeftX(), Constants.DriveConstants.driveDeadbandY, Constants.DriveConstants.MAXIMUMSPEED),
-    // () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    // () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
-   
-  
     elevator.setDefaultCommand(new ControlElevator(0.85, 0.45, 915));
 
 
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
+
+  //  * Use this method to define your button->command mappings. Buttons can be created by
+  //  * instantiating a {@link GenericHID} or one of its subclasses ({@link
+  //  * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+  //  * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+  //  */
   private void configureButtonBindings() {
 
-    // new Trigger(() -> operatorController.getRawButton(9))
-    // .onTrue( new InstantCommand(() -> {
-    //   manipulator.setGoalPoint(manipulatorSetpoint.CORALTRAVEL.getSetpoint());}));
-    
-   
-      //change to new buttons
-      // new Trigger(() -> operatorController.getRawButton(7))
-      //   .onTrue(new InstantCommand(() -> { 
-      //     elevator.setGoalPoint(elevator.getGoalSetpoint() + 150.0); 
-      //   }));
-
-      // new Trigger(() -> operatorController.getRawButton(11))
-      //   .onTrue(new InstantCommand(() -> { 
-      //     elevator.setGoalPoint(elevator.getGoalSetpoint() - 150.0); 
-      //   }));
-
-      // new Trigger(() -> operatorController.getRawButton(4))
-      //   .onTrue(new InstantCommand(() -> { 
-      //     manipulator.setGoalPoint(manipulator.getGoalSetpoint() + .05); 
-      //   }));
-
-      // new Trigger(() -> operatorController.getRawButton(8))
-      //   .onTrue(new InstantCommand(() -> { 
-      //     manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
-      //   }));
-
-      //   new Trigger(() -> operatorController.getRawButton(8))
-      //   .onTrue(new InstantCommand(() -> { 
-      //     manipulator.setGoalPoint(manipulator.getGoalSetpoint() - .05); 
-      //   }));
 
         new Trigger(() -> operatorController.getRightTriggerAxis() > .1) 
           .whileTrue(new InstantCommand(() -> {
@@ -292,13 +281,6 @@ SwerveInputStream driveDirectAngleKeyboard     = driveAngularVelocityKeyboard.co
         }));
         
 
-        // new Trigger(() -> operatorController.getRawButton(1))
-        // .onTrue(new InstantCommand(() -> { 
-        //   intake.setState(intakePoints.DISCHARGEALGAE);
-        // }))
-        // .onFalse (new InstantCommand(() -> { 
-        //   intake.setState(intakePoints.OFF);})
-        // );
   }
 
   private void configureAutoChooser() {

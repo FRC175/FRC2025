@@ -33,8 +33,8 @@ public class SwerveSubsytem extends SubsystemBase {
 
     public SwerveSubsytem (File directory) {
            // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
-           // TODO: set to lOW before competition/irl testing
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
+           // Set TelemetryVerbosty to POSE for best results during simulation
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
     double maximumSpeed = Units.feetToMeters(4.5);
     File swerveJsonDirectory = directory;
     try {

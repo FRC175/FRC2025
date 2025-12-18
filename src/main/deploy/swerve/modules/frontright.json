@@ -11,13 +11,13 @@
   },
   "angle": {
     "type": "sparkmax_neo",
-    "id": 4,
+    "id": 2,
     "canbus": null
   },
   "encoder": {
-    "type": "none",
-    "id": 0,
-    "canbus": null
+    "type": "cancoder",
+    "id": 11,
+    "canbus": "CANivore_BUS"
   },
   "inverted": {
     "drive": false,

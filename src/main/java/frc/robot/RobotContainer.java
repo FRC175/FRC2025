@@ -9,10 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.CyclicBarrier;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -34,22 +30,13 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
  
-import frc.robot.Constants.ControllerConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.elevatorSetpoint;
-import frc.robot.Constants.manipulatorSetpoint;
+
 import frc.robot.utils.Controller;
 import frc.robot.utils.Utils;
 
 
 import frc.robot.subsystems.*;
-import frc.robot.commands.SetElevatorPosition;
-import frc.robot.commands.manipulator.Intake;
-import frc.robot.commands.manipulator.setManipWorking;
 
-import frc.robot.commands.manipulator.Discharge;
-import frc.robot.commands.SetElevatorPositionManual;
-// import frc.robot.commands.Swerve;
 
 
 
@@ -66,37 +53,28 @@ public class RobotContainer {
 ; 
   
   private final XboxController driverController/* , operatorController*/;
-  private final XboxController operatorController;
+
   private final SendableChooser<Command> autoChooser;
  /// private final Shuckleboard shuffleboard;
-  private final Cage cage;
-  private final Elevator elevator;
-  private final Manipulator manipulator;
 
-
-private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-  
 
   private static RobotContainer instance;
-
+  private static Limelight limelight;
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
     //this.shuffleboard = Shuckleboard.getInstance();
-    this.cage = Cage.getInstance();
-    this.elevator = Elevator.getInstance();
-    this.manipulator = Manipulator.getInstance();
-    
-
-    driverController = new  XboxController(ControllerConstants.DRIVER_CONTROLLER_PORT);
-    operatorController = new XboxController(ControllerConstants.OPERATOR_CONTROLLER_PORT);
-    
+ 
+   
+    driverController = new  XboxController(0);
+   
     autoChooser = new SendableChooser<>();
+    limelight = new Limelight();
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
-     
+  
 
     // Configure the default commands
     configureDefaultCommands();
@@ -134,16 +112,10 @@ private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.ge
     // cage.setDefaultCommand(new RunCommand(() -> {
     //   cage.enableCompressor();
     // } , cage));
-    drive.setDefaultCommand(drive.driveRelativeCommand(() ->
-     MathUtil.applyDeadband(-1*driverController.getLeftX(), Constants.DriveConstants.driveDeadbandY, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> MathUtil.applyDeadband(driverController.getLeftY(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED),
-    () -> MathUtil.applyDeadband(driverController.getRightX(), Constants.DriveConstants.driveDeadbandX, Constants.DriveConstants.MAXIMUMSPEED)));
-   
-   
+    
     //manipulator.setDefaultCommand (new setManipWorking(manipulator, .05, 0.3));
 
-   elevator.setDefaultCommand(new InstantCommand(() -> {}, elevator));
-   
+ 
   }
 
   /**
@@ -153,46 +125,15 @@ private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.ge
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new Trigger(() -> operatorController.getBButtonPressed())
-    .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.ALGAE);;}));
   
-     new Trigger(() -> operatorController.getAButtonPressed())
-    .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.CORAL);;}));
-   
-     new Trigger(() -> operatorController.getXButtonPressed())
-    .onTrue(new InstantCommand(() -> {manipulator.setGoalSetpoint(manipulatorSetpoint.INTAKING);;}));
-   
-    
-    
     // B button ) triggers the cage pneumatics
     
     // new Trigger(() -> operatorController.getBButtonPressed())
     // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.GROUND));
-    // // dDpad Down ) sends the elevator to Lowest position (ground))
-    // new Trigger(() -> operatorController.getRawButtonPressed(14))
-    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L1));
-    // new Trigger(() -> operatorController.getRawButtonPressed(10))
-    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L2));
-    // new Trigger(() -> operatorController.getRawButtonPressed(6))
-    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L3));
-    // new Trigger(() -> operatorController.getRawButtonPressed(2))
-    // .onTrue( new SetElevatorPosition(.01, 0.01, 6, elevatorSetpoint.L4));
    
-    // dDpad up) sends the elevator to L4)
+   // dDpad up) sends the elevator to L4)
 
-    new Trigger(() -> operatorController.getLeftBumperButton())
-    .onTrue(
-      new Intake(.1, 0.03)
-    )
-    .onFalse(new InstantCommand(() -> {
-      manipulator.setIntakeOpenLoop(0); }, manipulator));
-      //tweak
-
-      new Trigger(() -> operatorController.getRightBumperButton())
-      .onTrue(new Discharge(.03))
-      .onFalse(new InstantCommand(() -> {
-        manipulator.setIntakeOpenLoop(0); }, manipulator));
-
+   
     // new Trigger(() -> operatorController.getRawButtonPressed(1))
     // .onTrue();
 
@@ -218,9 +159,7 @@ private final SwerveSubsystem drive = new SwerveSubsystem(new File(Filesystem.ge
   //   .onTrue(new SetElevatorPositionManual(true, 0.1))
   //   .onFalse(new InstantCommand(() -> elevator.setOpenLoop(0), elevator));
 
-  //     new Trigger(() -> operatorController.getRawButton(11))
-  //     .onTrue(new SetElevatorPositionManual(false, -0.1))
-  //     .onFalse(new InstantCommand(() -> elevator.setOpenLoop(0)));
+   
 
   //     new Trigger(() -> driverController.getLeftBumperButton())
   //     .onTrue(new InstantCommand(() -> drive.resetGyro(0), drive));
